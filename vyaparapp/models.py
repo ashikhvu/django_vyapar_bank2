@@ -170,4 +170,9 @@ class BankTransactionModel(models.Model):
     transfer_type=models.CharField(max_length=255,null=True)
     current_amount = models.BigIntegerField(default=0)
 
+class Table001(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.BigIntegerField()
+    quantity = models.BigIntegerField()
+
 #************************   ASHIKH V U (end) *************************

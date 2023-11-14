@@ -214,27 +214,38 @@
                             </div>
                             <div class="d-flex">
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <button class="btn p-0 ps-2 pe-2 ms-2" type="button" onclick="exportToExcel()"><span><img width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
+                                <form action="{% url 'import_from_excel' %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input id="file_" hidden type="file"  name="excel_file">
+                                    <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
+                                    <input id="submit_import_excel" hidden type="submit">
+                                </form>
+                                <button class="btn p-0 ps-1 pe-1 m-0" type="button" onclick="exportToExcel()"><span><img draggable="false" width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
                             </div>
                         </div>
                             <div class="mt-3" style="overflow: scroll;height: 31rem;">
                                 <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
                                     <thead>
-                                        <th class="text-center fs-2">#</th>
+                                        <th class="text-center fs-2 hide_field">#</th>
                                         <th class="text-center fs-2">TYPE <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2 show_bank_id" hidden>FROM <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2 show_bank_id" hidden>TO <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">NAME <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">DATE <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">AMOUNT <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center p-0 m-0"></th>
                                     </thead>
                                     <tbody>
-                                        <tr {% if bank.open_balance == 0 %} hidden{% endif %} class="fs-2">
-                                            <td class="text-center" style="padding-top: 1.4rem;">
+                                        {% if bank.open_balance != 0 %}
+                                        <tr class="fs-2 open_balane_remove">
+                                            <td class="text-center hide_field" style="padding-top: 1.4rem;">
                                                 <div class="d-flex justify-content-center">
                                                     <div style="width: 10px;height: 10px;" class="bg-dark rounded-pill bs_sm"></div>
                                                 </div>
                                             </td>
                                             <td class="text-center">Open. Balance</td>
+                                            <td class="text-center show_bank_id" hidden></td>
+                                            <td class="text-center show_bank_id" hidden></td>
                                             <td class="text-center">Opening Blance</td>
                                             <td class="text-center">{{ bank.as_of_date|date:"d-m-Y" }}</td>
                                             <td class="text-center fw-bolder">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
@@ -250,14 +261,17 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        {% endif %} 
                                         {% for i in transactions %}
                                             <tr class="fs-2">
-                                                <td class="text-center" style="padding-top: 1.4rem;">
+                                                <td class="text-center hide_field" style="padding-top: 1.4rem;">
                                                     <div class="d-flex justify-content-center">
                                                         <div style="width: 10px;height: 10px;box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.205);border-radius: 50%;" {% if forloop.counter|mod:10 == 0 %}class="bg-success"{% elif forloop.counter|mod:10 == 1 %}class="bg-warning"{% elif forloop.counter|mod:10 == 2 %}class="bg-danger"{% elif forloop.counter|mod:10 == 3 %}class="bg-success"{% elif forloop.counter|mod:10 == 4 %}class="bg-info"{% elif forloop.counter|mod:10 == 5 %}class="bg-primary"{% elif forloop.counter|mod:10 == 6 %}class="bg-secondary"{% elif forloop.counter|mod:10 == 7 %}class="bg-warning"{% elif forloop.counter|mod:10 == 8 %}class="bg-danger"{% else %}class="bg-pink"{% endif %}></div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">{{ i.type|lower|capfirst }}</td>
+                                                <td class="text-center show_bank_id" hidden>{{ i.from_here.id }}</td>
+                                                <td class="text-center show_bank_id" hidden>{{ i.to_here.id }}</td>
                                                 <td class="text-center">
                                                     {% if i.type == 'Cash Deposit' %}
                                                         Cash Deposit
@@ -288,23 +302,6 @@
                                                     {% else %}
                                                         <p style="color: green;">+ ₹{{ i.amount }}</p>
                                                     {% endif %}
-                                                    <!-- {% if i.from_here.id == bank.id %} 
-                                                        {% if i.type == 'Adjustment Increse' %}
-                                                            <p style="color: green;">+ ₹{{ i.amount }}</p>
-                                                        {% elif i.type == 'Adjustment Reduce' %}
-                                                            <p style="color: rgb(255, 0, 0);">- ₹{{ i.amount }}</p>
-                                                        {% else %}
-                                                            <p style="color: rgb(255, 0, 0);">- ₹{{ i.amount }}</p>   
-                                                        {% endif %}      
-                                                    {% elif i.to_here == bank.id %}
-                                                    {% if i.type == 'Adjustment Increse' %}
-                                                            <p style="color: green;">+ ₹{{ i.amount }}</p>
-                                                        {% elif i.type == 'Adjustment Reduce' %}
-                                                            <p style="color: rgb(255, 0, 0);">- ₹{{ i.amount }}</p>
-                                                        {% else %}   
-                                                            <p style="color: green;">+ ₹{{ i.amount }}</p>  
-                                                        {% endif %}
-                                                    {% endif %} -->
                                                 </td>
                                                 <td class="p-0 pt-1 m-0">
                                                     <div class="btn-group mb-1">
@@ -367,6 +364,13 @@
 
 <script>
     $(document).ready(function(){
+        $('#file_').on('change',function(){
+            setInterval(function(){
+                $('#submit_import_excel').click()
+            },500)
+        })
+    })
+    $(document).ready(function(){
         var b,a,temp
         $('.amount_truncate').each(function(){
             b =$(this).text()
@@ -391,16 +395,26 @@
             }
         })
     })
-
+    // hide open balance if its 0 or not available
+    $(document).ready(function(){
+        if('{{ bank.open_balance }}' === '0' || '{{ bank.open_balance }}' ==='')
+        {
+            $('.open_balane_remove').remove()
+        }
+    })
 
     function exportToExcel() {
         $('.hide_table_text_v').text('')
         $('.hide_table_text_d').text('')
+        $('.show_bank_id').attr('hidden',false)
+        $('.hide_field').remove()
         const table = document.getElementById('myTable');
         const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
         XLSX.writeFile(wb, "table_data.xlsx");
         $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
         $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
+        $('.show_bank_id').attr('hidden',true)
+        window.location.href=''
     }
     $(document).ready(function() {
         $("#search_item_input").on("keyup",function() {

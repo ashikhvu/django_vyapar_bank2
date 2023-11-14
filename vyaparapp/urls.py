@@ -141,6 +141,7 @@ urlpatterns = [
     path('delete_bank_transaction/<int:pk>',views.delete_bank_transaction,name='delete_bank_transaction'),
     path('view_or_edit_bank_transaction/<int:pk>',views.view_or_edit_bank_transaction,name='view_or_edit_bank_transaction'),
     path('update_bank_transaction/<int:pk>',views.update_bank_transaction,name='update_bank_transaction'),
+    path('import_from_excel',views.import_from_excel,name='import_from_excel'),
 
     #******************************************   ASHIKH V U (start) ****************************************************
     

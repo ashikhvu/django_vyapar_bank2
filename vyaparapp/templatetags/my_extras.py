@@ -1,4 +1,3 @@
-from dbm.ndbm import library
 from django import template
 
 register = template.Library()
