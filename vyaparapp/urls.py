@@ -141,7 +141,9 @@ urlpatterns = [
     path('delete_bank_transaction/<int:pk>/<int:bank_id>',views.delete_bank_transaction,name='delete_bank_transaction'),
     path('view_or_edit_bank_transaction/<int:pk>/<int:bank_id>',views.view_or_edit_bank_transaction,name='view_or_edit_bank_transaction'),
     path('update_bank_transaction/<int:pk>/<int:bank_id>',views.update_bank_transaction,name='update_bank_transaction'),
-    path('import_from_excel',views.import_from_excel,name='import_from_excel'),
+    path('import_from_excel/<int:pk>',views.import_from_excel,name='import_from_excel'),
+    path('transaction_history/<int:pk>/<int:bank_id>',views.transaction_history,name='transaction_history'),
+    
 
     #******************************************   ASHIKH V U (start) ****************************************************
     

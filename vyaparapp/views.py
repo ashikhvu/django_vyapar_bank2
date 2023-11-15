@@ -1277,6 +1277,7 @@ def banks_list(request,pk):
       first_bank = all_banks.first()
       transactions_all = BankTransactionModel.objects.filter(user=request.user.id)
       transactions = transactions_all.filter(Q(from_here=first_bank) | Q(to_here=first_bank))
+      return redirect('banks_list',pk=first_bank.id)
     else:
       first_bank = all_banks.get(id=pk)
       transactions_all = BankTransactionModel.objects.filter(user=request.user.id)
@@ -1362,6 +1363,12 @@ def bank_create_new(request):
                                 current_balance=open_balance,
                                 created_by=user.first_name)
           bank_data.save()
+          tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                              bank=bank_data,
+                                              date=as_of_date,
+                                              done_by_name=request.user.first_name,
+                                              done_by=request.user)
+          tr_history.save()
           if request.POST.get('save_and_next'):
             messages.success(request,'Bank created successfully')
             return redirect('bank_create')
@@ -1612,6 +1619,7 @@ def delete_bank_transaction(request,pk,bank_id):
       bank2.current_balance -= trans.amount
       bank2.save()
       trans.delete()
+      print('entered')
       return redirect('banks_list',pk=bank_id)
     elif trans.type == 'Adjustment Increase' or trans.type == 'ADJUSTMENT INCREASE':
       bank1 = BankModel.objects.get(id=trans.from_here.id)
@@ -1712,7 +1720,7 @@ def update_bank_transaction(request,pk,bank_id):
 from openpyxl import load_workbook
 from django.utils import timezone
 
-def import_from_excel(request):
+def import_from_excel(request,pk):
     current_datetime = timezone.now()
     date =  current_datetime.date()
 
@@ -1813,8 +1821,16 @@ def import_from_excel(request):
                                   date=DATE,
                                   )
               transaction.save()
-    return redirect('banks_list',pk=0)
+    return redirect('banks_list',pk=pk)
 
+
+@login_required(login_url='login')
+def transaction_history(request,pk,bank_id):
+    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    # permission
+    return render(request,'company/bank_transaction_history.html',{"allmodules":allmodules})
 
 
 #******************************************   ASHIKH V U (end) ****************************************************

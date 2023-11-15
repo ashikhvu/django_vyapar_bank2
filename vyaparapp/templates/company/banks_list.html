@@ -1,5 +1,3 @@
-<!-- create by athul -->
-
 {% extends 'company/src/html/base.html' %}
 
 {% block content %}
@@ -26,6 +24,12 @@
     }
     .tr{
         color: rgb(218, 0, 0);
+    }
+    .to{
+        color: orange;
+    }
+    .tbl{
+        color: blue;
     }
     .btn_add{
         background-color: orange;
@@ -214,7 +218,7 @@
                             </div>
                             <div class="d-flex">
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <form id="myForm" action="{% url 'import_from_excel' %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
+                                <form id="myForm" action="{% url 'import_from_excel' bank.id %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input id="file_" hidden type="file"  name="excel_file">
                                     <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
@@ -273,13 +277,13 @@
                                                 <td class="text-center show_bank_id" hidden>{{ i.from_here.id }}</td>
                                                 <td class="text-center show_bank_id" hidden>{{ i.to_here.id }}</td>
                                                 <td class="text-center">
-                                                    {% if i.type == 'Cash Deposit' %}
+                                                    {% if i.type == 'Cash Deposit' or i.type == 'CASH DEPOSIT' %}
                                                         Cash Deposit
-                                                    {% elif i.type == 'Cash Withdraw' %}
+                                                    {% elif i.type == 'Cash Withdraw' or i.type == 'CASH WITHDRAW' %}
                                                         Cash Withdraw
-                                                    {% elif i.type == 'Adjustment Reduce' %}
+                                                    {% elif i.type == 'Adjustment Reduce'  or i.type == 'ADJUSTMENT REDUCE'  %}
                                                         Adjustment Reduce
-                                                    {% elif i.type == 'Adjustment Increase' %}
+                                                    {% elif i.type == 'Adjustment Increase' or i.type == 'ADJUSTMENT INCREASE' %}
                                                     Adjustment Increase
                                                     {% else %}
                                                         {% if i.from_here.id == bank.id %}
@@ -315,6 +319,7 @@
                                                             hx-target="#bank_modal_view_or_edit"
                                                             ><span class="fa fa-eye pe-2 tg"></span> View / Edit</button></li>
                                                           <li><button type="button" onclick="delete_bank_transaction({{ i.id }},{{ bank.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
+                                                          <li><a type="button" class="dropdown-item fw-bold tb hide_table_text_d" href="{% url 'transaction_history' i.id bank.id %}"><span class="fa fa-history tbl" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Transaction History</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -510,15 +515,18 @@
                     buttons: false,
                 })
                 .then((willDelete) => {
-                    var url = "{% url 'delete_bank_transaction' 0 1 %}".replace('0', Id).replace('1', bank_id);
-                    window.location.href = url;
+                    // alert(Id+" "+bank_id)
+                    // $('.click_here_ooo').click()
+                    window.location.href = "{% url 'delete_bank_transaction' 0 1 %}".replace('0', Id).replace('1', bank_id);
                 });
             } else {
                 swal("Action Cancelled!");
             }
         });
     }
-
+    $('.click_here_ooo').on('click',function(){
+        alert('clicked.......')
+    })
     function bank_open_stk_delete(Id)
     {
         swal({
@@ -552,12 +560,12 @@
             }
         });
     }
-    document.getElementById('myForm').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSubmit();
-        }
-    });
+    // document.getElementById('myForm').addEventListener('keypress', function (e) {
+    //     if (e.key === 'Enter') {
+    //         e.preventDefault();
+    //         handleSubmit();
+    //     }
+    // });
 </script>
 
 {% endblock  %}
