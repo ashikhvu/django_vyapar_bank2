@@ -52,7 +52,7 @@
 <div class="body-wrapper">
     <br><br><br>
     <div class="row p-0 m-0">
-        <div class="col-12  p-0 m-0" style="height: ;">
+        <div class="col-12  p-0 m-0">
             <div class=" bg-light bg-light bs pb-0 mb-0"style="height:100%;width:100%">
                 <div class="d-flex justify-content-center pt-4">
                     <a href=""  id="b1" class="btn  text-white" style="margin-right: 10px; background-color: rgb(252, 3, 3,0.7);border-radius: 20px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">Add Sale  <i class="fa fa-plus"></i></a>
@@ -214,7 +214,7 @@
                             </div>
                             <div class="d-flex">
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <form action="{% url 'import_from_excel' %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
+                                <form id="myForm" action="{% url 'import_from_excel' %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input id="file_" hidden type="file"  name="excel_file">
                                     <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
@@ -244,10 +244,10 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">Open. Balance</td>
-                                            <td class="text-center show_bank_id" hidden></td>
+                                            <td class="text-center show_bank_id" hidden>{{ bank.id }}</td>
                                             <td class="text-center show_bank_id" hidden></td>
                                             <td class="text-center">Opening Blance</td>
-                                            <td class="text-center">{{ bank.as_of_date|date:"d-m-Y" }}</td>
+                                            <td class="text-center">{{ bank.as_of_date|date:"Y-m-d" }}</td>
                                             <td class="text-center fw-bolder">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
                                             <td class="p-0 pt-1 m-0">
                                                 <div class="btn-group mb-1">
@@ -289,7 +289,7 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 </td>
-                                                <td class="text-center">{{ i.date|date:"d-m-Y" }}</td>
+                                                <td class="text-center">{{ i.date|date:"Y-m-d" }}</td>
                                                 <td class="text-center fw-bolder">
                                                     {% if i.type == 'Cash Withdraw' %}
                                                         <p style="color: rgb(255, 0, 0);">- ₹{{ i.amount }}</p>
@@ -310,11 +310,11 @@
                                                         </button>
                                                         <ul class="dropdown-menu">
                                                           <li><button type="button" data-bs-toggle="modal" data-bs-target="#myModal2" class="dropdown-item fw-bold tb hide_table_text_v" 
-                                                            hx-get="{% url 'view_or_edit_bank_transaction' i.id %}"
+                                                            hx-get="{% url 'view_or_edit_bank_transaction' i.id bank.id %}"
                                                             hx-trigger="click delay:0s"
                                                             hx-target="#bank_modal_view_or_edit"
                                                             ><span class="fa fa-eye pe-2 tg"></span> View / Edit</button></li>
-                                                          <li><button type="button" onclick="delete_bank_transaction({{ i.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
+                                                          <li><button type="button" onclick="delete_bank_transaction({{ i.id }},{{ bank.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -365,9 +365,9 @@
 <script>
     $(document).ready(function(){
         $('#file_').on('change',function(){
-            setInterval(function(){
+            // setInterval(function(){
                 $('#submit_import_excel').click()
-            },500)
+            // },0)
         })
     })
     $(document).ready(function(){
@@ -492,7 +492,7 @@
             }
         });
     }
-    function delete_bank_transaction(Id)
+    function delete_bank_transaction(Id,bank_id)
     {
         swal({
             title: "Confirmation !",
@@ -509,17 +509,10 @@
                     icon: "success",
                     buttons: false,
                 })
-                // 
                 .then((willDelete) => {
-                if (willDelete) {
-                    // Redirect to the delete_teacher view with the teacher's ID
-                    window.location.href = "{% url 'delete_bank_transaction' 0 %}".replace('0', Id);
-                    
-                } else {
-                    window.location.href = "{% url 'delete_bank_transaction' 0 %}".replace('0', Id);
-                }
-            });
-                // 
+                    var url = "{% url 'delete_bank_transaction' 0 1 %}".replace('0', Id).replace('1', bank_id);
+                    window.location.href = url;
+                });
             } else {
                 swal("Action Cancelled!");
             }
@@ -559,6 +552,12 @@
             }
         });
     }
+    document.getElementById('myForm').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit();
+        }
+    });
 </script>
 
 {% endblock  %}

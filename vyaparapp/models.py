@@ -164,15 +164,10 @@ class BankTransactionModel(models.Model):
     to_here = models.ForeignKey(BankModel,related_name='to_this_bank',on_delete=models.CASCADE,null=True,blank=True)
     type = models.CharField(max_length=255,null=True)
     name = models.CharField(max_length=255,null=True)
-    date = models.DateField()
+    date = models.DateField(null=True)
     amount = models.BigIntegerField(default=0)
     created_date = models.DateTimeField(auto_now_add=True)
     transfer_type=models.CharField(max_length=255,null=True)
     current_amount = models.BigIntegerField(default=0)
-
-class Table001(models.Model):
-    name = models.CharField(max_length=255)
-    price = models.BigIntegerField()
-    quantity = models.BigIntegerField()
 
 #************************   ASHIKH V U (end) *************************

@@ -138,9 +138,9 @@ urlpatterns = [
     path('cash_to_bank_transaction_create',views.cash_to_bank_transaction_create,name='cash_to_bank_transaction_create'),
     path('get_adjust_bank_balance_create',views.get_adjust_bank_balance_create,name='get_adjust_bank_balance_create'),
     path('delete_bank_open_balance/<int:pk>',views.delete_bank_open_balance,name='delete_bank_open_balance'),
-    path('delete_bank_transaction/<int:pk>',views.delete_bank_transaction,name='delete_bank_transaction'),
-    path('view_or_edit_bank_transaction/<int:pk>',views.view_or_edit_bank_transaction,name='view_or_edit_bank_transaction'),
-    path('update_bank_transaction/<int:pk>',views.update_bank_transaction,name='update_bank_transaction'),
+    path('delete_bank_transaction/<int:pk>/<int:bank_id>',views.delete_bank_transaction,name='delete_bank_transaction'),
+    path('view_or_edit_bank_transaction/<int:pk>/<int:bank_id>',views.view_or_edit_bank_transaction,name='view_or_edit_bank_transaction'),
+    path('update_bank_transaction/<int:pk>/<int:bank_id>',views.update_bank_transaction,name='update_bank_transaction'),
     path('import_from_excel',views.import_from_excel,name='import_from_excel'),
 
     #******************************************   ASHIKH V U (start) ****************************************************

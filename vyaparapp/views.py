@@ -1587,59 +1587,64 @@ def delete_bank_open_balance(request,pk):
   return redirect('banks_list',pk=pk)
 
 @login_required(login_url='login')
-def delete_bank_transaction(request,pk):
-  trans = BankTransactionModel.objects.get(id=pk)
-  if trans.type == 'BANK TO BANK':
-    bank1 = BankModel.objects.get(id=trans.from_here.id)
-    bank1.current_balance += trans.amount
-    bank1.save()
-    bank2 = BankModel.objects.get(id=trans.to_here.id)
-    bank2.current_balance -= trans.amount
-    bank2.save()
-    trans.delete()
-    return redirect('banks_list',pk=trans.from_here.id)
-  elif trans.type == 'Cash Withdraw':
-    bank1 = BankModel.objects.get(id=trans.from_here.id)
-    bank1.current_balance += trans.amount
-    bank1.save()
-    trans.delete()
-    return redirect('banks_list',pk=trans.from_here.id)
-  elif trans.type == 'Cash Deposit':
-    bank2 = BankModel.objects.get(id=trans.to_here.id)
-    bank2.current_balance -= trans.amount
-    bank2.save()
-    trans.delete()
-    return redirect('banks_list',pk=trans.to_here.id)
-  elif trans.type == 'Adjustment Increase':
-    bank1 = BankModel.objects.get(id=trans.from_here.id)
-    bank1.current_balance -= trans.amount
-    bank1.save()
-    trans.delete()
-    return redirect('banks_list',pk=trans.from_here.id)
-  elif trans.type == 'Adjustment Reduce':
-    bank1 = BankModel.objects.get(id=trans.from_here.id)
-    bank1.current_balance += trans.amount
-    bank1.save()
-    trans.delete()
-    return redirect('banks_list',pk=trans.from_here.id)
+def delete_bank_transaction(request,pk,bank_id):
+  print(pk,bank_id)
+  try:
+    trans = BankTransactionModel.objects.get(id=pk)
+    if trans.type == 'BANK TO BANK':
+      bank1 = BankModel.objects.get(id=trans.from_here.id)
+      bank1.current_balance += trans.amount
+      bank1.save()
+      bank2 = BankModel.objects.get(id=trans.to_here.id)
+      bank2.current_balance -= trans.amount
+      bank2.save()
+      trans.delete()
+      print('enterd')
+      return redirect('banks_list',pk=bank_id)
+    elif trans.type == 'Cash Withdraw' or trans.type == 'CASH WITHDRAW':
+      bank1 = BankModel.objects.get(id=trans.from_here.id)
+      bank1.current_balance += trans.amount
+      bank1.save()
+      trans.delete()
+      return redirect('banks_list',pk=bank_id)
+    elif trans.type == 'Cash Deposit' or trans.type == 'CASH DEPOSIT':
+      bank2 = BankModel.objects.get(id=trans.to_here.id)
+      bank2.current_balance -= trans.amount
+      bank2.save()
+      trans.delete()
+      return redirect('banks_list',pk=bank_id)
+    elif trans.type == 'Adjustment Increase' or trans.type == 'ADJUSTMENT INCREASE':
+      bank1 = BankModel.objects.get(id=trans.from_here.id)
+      bank1.current_balance -= trans.amount
+      bank1.save()
+      trans.delete()
+      return redirect('banks_list',pk=bank_id)
+    elif trans.type == 'Adjustment Reduce' or trans.type == 'ADJUSTMENT REDUCE':
+      bank1 = BankModel.objects.get(id=trans.from_here.id)
+      bank1.current_balance += trans.amount
+      bank1.save()
+      trans.delete()
+      return redirect('banks_list',pk=bank_id)
+  except:
+    return redirect('banks_list',pk=bank_id)
   return redirect('banks_list',pk=0)
 
 @login_required(login_url='login')
-def view_or_edit_bank_transaction(request,pk):
+def view_or_edit_bank_transaction(request,pk,bank_id):
   transaction = BankTransactionModel.objects.get(id=pk)
   banks = BankModel.objects.filter(user=request.user.id)
-  if transaction.type == "BANK TO BANK":
-    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_to_bank_view_or_edit.html',{"transaction":transaction,"banks":banks})
-  elif transaction.type == 'Cash Withdraw':
-    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_to_cash_view_or_edit.html',{"transaction":transaction,"banks":banks})
-  elif transaction.type == 'Cash Deposit':
-    return TemplateResponse(request,'company/bank_transaction_view_or_edit/cash_to_bank_view_or_edit.html',{"transaction":transaction,"banks":banks})
-  elif transaction.type == 'Adjustment Increase' or transaction.type == 'Adjustment Reduce':
-    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_adjust_bank_balance_view_or_edit.html',{"transaction":transaction,"banks":banks})
-
+  bank = BankModel.objects.get(id=bank_id)
+  if transaction.type == "BANK TO BANK" or transaction.type == 'Bank to bank':
+    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_to_bank_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
+  elif transaction.type == 'Cash Withdraw' or transaction.type == 'Cash withdraw' or transaction.type == 'CASH WITHDRAW':
+    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_to_cash_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
+  elif transaction.type == 'Cash Deposit' or transaction.type == 'Cash deposit' or transaction.type == 'CASH DEPOSIT':
+    return TemplateResponse(request,'company/bank_transaction_view_or_edit/cash_to_bank_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
+  elif transaction.type == 'Adjustment Increase' or transaction.type == 'Adjustment increase' or transaction.type == 'Adjustment Reduce' or transaction.type == 'Adjustment reduce' or transaction.type == 'ADJUSTMENT INCREASE' or transaction.type == 'ADJUSTMENT REDUCE':
+    return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_adjust_bank_balance_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
 
 @login_required(login_url='login')
-def update_bank_transaction(request,pk):
+def update_bank_transaction(request,pk,bank_id):
   if request.method=="POST":
     amount = request.POST.get('amount')
     date = request.POST.get('date')
@@ -1660,8 +1665,8 @@ def update_bank_transaction(request,pk):
       bank2.save()
       trans.amount = amount
       trans.save()
-      return redirect('banks_list',pk=trans.from_here.id)
-    elif trans.type == 'Cash Withdraw':
+      return redirect('banks_list',pk=bank_id)
+    elif trans.type == 'Cash Withdraw' or trans.type == 'CASH WITHDRAW':
       bank1 = BankModel.objects.get(id=trans.from_here.id)
       if trans.amount > int(amount):
         bank1.current_balance += (trans.amount-int(amount))
@@ -1671,7 +1676,7 @@ def update_bank_transaction(request,pk):
       trans.amount = amount
       trans.save()
       return redirect('banks_list',pk=trans.from_here.id)
-    elif trans.type == 'Cash Deposit':
+    elif trans.type == 'Cash Deposit'  or trans.type == 'CASH DEPOSIT':
       bank2 = BankModel.objects.get(id=trans.to_here.id)
       if trans.amount > int(amount):
         bank2.current_balance -= (trans.amount-int(amount))
@@ -1681,7 +1686,7 @@ def update_bank_transaction(request,pk):
       trans.amount = amount
       trans.save()
       return redirect('banks_list',pk=trans.to_here.id)
-    elif trans.type == 'Adjustment Increase':
+    elif trans.type == 'Adjustment Increase' or trans.type == 'ADJUSTMENT INCREASE':
       bank1 = BankModel.objects.get(id=trans.from_here.id)
       if trans.amount > int(amount):
         bank1.current_balance -= (trans.amount-int(amount))
@@ -1691,7 +1696,7 @@ def update_bank_transaction(request,pk):
       trans.amount = amount
       trans.save()
       return redirect('banks_list',pk=trans.from_here.id)
-    elif trans.type == 'Adjustment Reduce':
+    elif trans.type == 'Adjustment Reduce' or trans.type == 'ADJUSTMENT REDUCE':
       bank1 = BankModel.objects.get(id=trans.from_here.id)
       if trans.amount > int(amount):
         bank1.current_balance += (trans.amount-int(amount))
@@ -1712,7 +1717,6 @@ def import_from_excel(request):
     date =  current_datetime.date()
 
     if request.method == "POST" and 'excel_file' in request.FILES:
-        print('\n\tentered\n')
         user = User.objects.get(id=request.user.id)
         get_company_id_using_user_id = company.objects.get(user=request.user.id)
     
@@ -1722,21 +1726,93 @@ def import_from_excel(request):
         ws = wb.active
 
         for row in ws.iter_rows(min_row=2, values_only=True):
-            TYPE, NAME, FROM,TO,DATE,AMOUNT = row
-            print(f'{TYPE}  {FROM}  {TO}  {NAME}  {DATE}  {AMOUNT}')
-            
+            TYPE, FROM, TO,NAME,DATE,AMOUNT = row
 
-            # from_here = BankModel.objects.get(id=int(FROM))
-            # to_here = BankModel.objects.get(id=int(TO))
-            # transaction =BankTransactionModel(user = user,
-            #                      company=get_company_id_using_user_id,
-            #                      from_here=from_here,
-            #                      to_here=to_here,
-            #                      type=TYPE,
-            #                      amount=AMOUNT,
-            #                      date=DATE,
-            #                     )
-            # transaction.save()
+            if TYPE != None:
+              TYPE = TYPE.upper()
+            
+            if AMOUNT != None:
+              AMOUNT = AMOUNT.replace(' ','')
+              AMOUNT = AMOUNT.replace('₹','')
+              AMOUNT = AMOUNT.replace('-','')
+              AMOUNT = AMOUNT.replace('+','')
+              AMOUNT = int(float(AMOUNT))
+
+            print(f'{TYPE}  {FROM}  {TO}    {NAME}  {DATE}  {AMOUNT}')
+            
+            if TYPE == "BANK TO BANK" or TYPE == 'Bank to bank':
+              from_here = BankModel.objects.get(id=int(FROM))
+              to_here = BankModel.objects.get(id=int(TO))
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  to_here=to_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  )
+              transaction.save()
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+              to_here.current_balance += AMOUNT
+              to_here.save()
+            elif TYPE == 'Open. Balance' or TYPE == 'OPEN. BALANCE':
+              from_here = BankModel.objects.get(id=int(FROM))
+              if from_here.open_balance > AMOUNT:
+                from_here.current_balance += from_here.open_balance - AMOUNT
+              else:
+                from_here.current_balance -= from_here.open_balance - AMOUNT
+              from_here.open_balance = AMOUNT
+              from_here.save()
+            elif TYPE == 'Cash Withdraw' or TYPE == 'Cash withdraw' or TYPE == 'CASH WITHDRAW':
+              from_here = BankModel.objects.get(id=int(FROM))
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  )
+              transaction.save()
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+            elif TYPE == 'Cash Deposit' or TYPE == 'Cash deposit' or TYPE == 'CASH DEPOSIT':
+              to_here = BankModel.objects.get(id=int(TO))
+              to_here.current_balance += AMOUNT
+              to_here.save()
+
+              transaction_data = BankTransactionModel(user = user,
+                                                  company=get_company_id_using_user_id,
+                                                  to_here=to_here,
+                                                  type=TYPE,
+                                                  amount=AMOUNT,
+                                                  date=DATE,
+                                                  )
+              transaction_data.save()
+            elif TYPE == 'Adjustment Increase' or TYPE == 'Adjustment increase' or TYPE == 'ADJUSTMENT INCREASE':
+              from_here = BankModel.objects.get(id=int(FROM))
+              from_here.current_balance += AMOUNT
+              from_here.save()
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  )
+              transaction.save()
+            elif TYPE == 'Adjustment Reduce' or TYPE == 'Adjustment reduce' or TYPE == 'ADJUSTMENT REDUCE':
+              from_here = BankModel.objects.get(id=int(FROM))
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+              transaction = BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  )
+              transaction.save()
     return redirect('banks_list',pk=0)
 
 
