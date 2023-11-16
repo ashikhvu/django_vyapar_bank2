@@ -681,6 +681,9 @@ def login(request):
     else:
       messages.info(request, 'Invalid Username or Password. Try Again.')
       return redirect('log_page')
+  else:  
+   return redirect('log_page')
+  
 def clients(request):
   return render(request,'admin/clients.html')
 
@@ -1258,35 +1261,59 @@ def bank_ifsc_check (request):
 
 @login_required(login_url='login')
 def bank_create(request):
-  get_company_id_using_user_id = company.objects.get(user=request.user.id)
-  # permission
-  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
-  # permission
-  return render(request,'company/bank_create.html',{"allmodules":allmodules})
+  try:
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    # get_company_id_using_user_id = company.objects.get(user=staff.company.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    # permission
+    return render(request,'company/bank_create.html',{"allmodules":allmodules})
+  except:
+    user = User.objects.get(id=request.user.id)
+    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    # permission
+    return render(request,'company/bank_create.html',{"allmodules":allmodules})
 
 @login_required(login_url='login')
 def banks_list(request,pk):
-  # if pk==0:
-  get_company_id_using_user_id = company.objects.get(user=request.user.id)
-  # permission
-  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
-  # permission
+ 
   try:
-    all_banks = BankModel.objects.filter(user=request.user.id)
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    # permission
+  except:
+    user = User.objects.get(id=request.user.id)
+    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    # permission
+
+  try:
+    all_banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
     if pk == 0:
       first_bank = all_banks.first()
-      transactions_all = BankTransactionModel.objects.filter(user=request.user.id)
+      transactions_all = BankTransactionModel.objects.filter(company=get_company_id_using_user_id.id)
       transactions = transactions_all.filter(Q(from_here=first_bank) | Q(to_here=first_bank))
+      tr_history = BankTransactionHistory.objects.filter().order_by('date')
+      print(tr_history)
       return redirect('banks_list',pk=first_bank.id)
     else:
       first_bank = all_banks.get(id=pk)
-      transactions_all = BankTransactionModel.objects.filter(user=request.user.id)
+      transactions_all = BankTransactionModel.objects.filter(company=get_company_id_using_user_id.id)
       transactions = transactions_all.filter(Q(from_here=pk) | Q(to_here=pk))
+      tr_history = BankTransactionHistory.objects.filter().order_by('date')
     if all_banks.exists():
       return render(request,'company/banks_list.html',{"allmodules":allmodules,
                                                       "all_banks":all_banks,
                                                       "bank":first_bank,
-                                                      "transactions":transactions}) 
+                                                      "transactions":transactions,
+                                                      "tr_history":tr_history}) 
     else:
       return render(request,'company/bank_create_first_bank.html',{"allmodules":allmodules,}) 
   except:
@@ -1365,7 +1392,13 @@ def bank_create_new(request):
           bank_data.save()
           tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                               bank=bank_data,
-                                              date=as_of_date,
+                                              action="BANK CREATION : "+bank_data.bank_name.upper(),
+                                              done_by_name=request.user.first_name,
+                                              done_by=request.user)
+          tr_history.save()
+          tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                              bank=bank_data,
+                                              action="BANK OPEN BALANCE CREATED : "+str(bank_data.open_balance),
                                               done_by_name=request.user.first_name,
                                               done_by=request.user)
           tr_history.save()
@@ -1491,11 +1524,18 @@ def bank_to_bank_transaction_create(request):
                                         from_here=from_here,
                                         to_here=to_here,
                                         type=type,
+                                        date=date,
                                         name=name,
                                         amount=amount,
-                                        date=date,
                                         )
     transaction_data.save()
+    tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=bank1,
+                                        bank_trans=transaction_data,
+                                        action="BANK TO BANK TRANSACTION CREATED : "+amount+" Rs",
+                                        done_by_name=request.user.first_name,
+                                        done_by=request.user)
+    tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
 @login_required(login_url='login')
@@ -1523,6 +1563,14 @@ def bank_to_cash_transaction_create(request):
                                         date=date,
                                         )
     transaction_data.save()
+    tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=bank1,
+                                        bank_trans=transaction_data,
+                                        action="BANK TO CASH TRANSACTION CREATED : "+amount+" Rs",
+                                        date=date,
+                                        done_by_name=request.user.first_name,
+                                        done_by=request.user)
+    tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
 @login_required(login_url='login')
@@ -1550,6 +1598,14 @@ def cash_to_bank_transaction_create(request):
                                         date=date,
                                         )
     transaction_data.save()
+    tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=bank2,
+                                        bank_trans=transaction_data,
+                                        action="CASH TO BANK TRANSACTION CREATED : "+amount+" Rs",
+                                        date=date,
+                                        done_by_name=request.user.first_name,
+                                        done_by=request.user)
+    tr_history.save()
   return redirect('banks_list',pk=to_here.id)
 
 
@@ -1583,6 +1639,13 @@ def get_adjust_bank_balance_create(request):
                                         date=date,
                                         )
     transaction_data.save()
+    tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=bank1,
+                                        bank_trans=transaction_data,
+                                        action="BANK BALANCE "+type.upper()+" : "+amount+" Rs",
+                                        done_by_name=request.user.first_name,
+                                        done_by=request.user)
+    tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
 @login_required(login_url='login')
@@ -1596,6 +1659,14 @@ def delete_bank_open_balance(request,pk):
 @login_required(login_url='login')
 def delete_bank_transaction(request,pk,bank_id):
   print(pk,bank_id)
+  try:
+    pk = request.POST.get('pk')
+    bank_id = request.POST.get('bank_id')
+    print(pk,bank_id)
+  except:
+    pk=pk
+    bank_id=bank_id
+
   try:
     trans = BankTransactionModel.objects.get(id=pk)
     if trans.type == 'BANK TO BANK':
@@ -1720,6 +1791,7 @@ def update_bank_transaction(request,pk,bank_id):
 from openpyxl import load_workbook
 from django.utils import timezone
 
+@login_required(login_url='login')
 def import_from_excel(request,pk):
     current_datetime = timezone.now()
     date =  current_datetime.date()
@@ -1823,14 +1895,28 @@ def import_from_excel(request,pk):
               transaction.save()
     return redirect('banks_list',pk=pk)
 
-
 @login_required(login_url='login')
 def transaction_history(request,pk,bank_id):
     get_company_id_using_user_id = company.objects.get(user=request.user.id)
     # permission
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     # permission
-    return render(request,'company/bank_transaction_history.html',{"allmodules":allmodules})
+    all_banks = BankModel.objects.filter(user=request.user.id)
+
+    tr_history1 = BankTransactionHistory.objects.filter(action__contains='BANK CREATION',bank=bank_id)
+    tr_history2 = BankTransactionHistory.objects.filter(action__contains='BANK OPEN BALANCE CREATED',bank=bank_id)    
+    tr_history = BankTransactionHistory.objects.filter(bank_trans=pk)
+    print(tr_history,'\n',tr_history1)
+    if pk != 0:
+      tr_historys = tr_history | tr_history1
+    else:
+      tr_historys = tr_history1 | tr_history1 | tr_history2
+    print(tr_history)
+    
+    return render(request,'company/bank_transaction_history.html',{"allmodules":allmodules,
+                                                                   "all_banks":all_banks,
+                                                                    "tr_historys":tr_historys,
+                                                                    "bank_id":bank_id})
 
 
 #******************************************   ASHIKH V U (end) ****************************************************

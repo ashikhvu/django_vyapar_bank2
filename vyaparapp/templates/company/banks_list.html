@@ -218,7 +218,8 @@
                             </div>
                             <div class="d-flex">
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <form id="myForm" action="{% url 'import_from_excel' bank.id %}" method="POST" class="p-0 m-0 ps-2" enctype="multipart/form-data">
+                                <button class="btn p-0 ps-2 pe-1 m-0" type="button" onclick=""><span><img draggable="false" width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
+                                <form id="myForm" action="{% url 'import_from_excel' bank.id %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input id="file_" hidden type="file"  name="excel_file">
                                     <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
@@ -261,6 +262,7 @@
                                                     <ul class="dropdown-menu">
                                                       <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'bank_view_or_edit' bank.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
                                                       <li><a class="dropdown-item fw-bold tb hide_table_text_d" onclick="bank_open_stk_delete({{ bank.id }})"><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
+                                                      <li><a type="button" class="dropdown-item fw-bold tb hide_table_text_d" href="{% url 'transaction_history' 0 bank.id %}"><span class="fa fa-history tbl" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Transaction History</a></li>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -517,7 +519,25 @@
                 .then((willDelete) => {
                     // alert(Id+" "+bank_id)
                     // $('.click_here_ooo').click()
-                    window.location.href = "{% url 'delete_bank_transaction' 0 1 %}".replace('0', Id).replace('1', bank_id);
+                    // window.location.href = "{% url 'delete_bank_transaction' 0 1 %}".replace('0', Id).replace('1', bank_id);
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "delete_bank_transaction" 0 0 %}',
+                        data: {
+                            'pk': Id,
+                            'bank_id':bank_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            // Handle success response from the second view
+                            console.log(response);
+                            window.location.href=''
+                        },
+                        error: function(error) {
+                            // Handle error response from the second view
+                            console.error(error);
+                        }
+                    });
                 });
             } else {
                 swal("Action Cancelled!");

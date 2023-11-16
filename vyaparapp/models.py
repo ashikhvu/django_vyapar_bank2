@@ -175,7 +175,7 @@ class BankTransactionHistory(models.Model):
     company = models.ForeignKey(company,on_delete=models.CASCADE,blank=True,null=True)
     bank = models.ForeignKey(BankModel,on_delete=models.CASCADE,blank=True,null=True)
     bank_trans = models.ForeignKey(BankTransactionModel,on_delete=models.CASCADE,blank=True,null=True)
-    date = models.DateField(null=True)
+    date = models.DateField(auto_now_add=True,null=True)
     action = models.CharField(max_length=255)
     done_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     done_by_name = models.CharField(max_length=255)

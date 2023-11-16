@@ -25,7 +25,7 @@ urlpatterns = [
     path('settings', views.settings, name='settings'),
     path('hide_options', views.hide_options, name='hide_options'),
 
-    path('staffhome/<id>', views.staffhome, name='staffhome'),
+    path('staffhome', views.staffhome, name='staffhome'),
     path('adminhome', views.adminhome, name='adminhome'),
     
     
