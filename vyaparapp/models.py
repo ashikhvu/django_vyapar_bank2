@@ -169,6 +169,8 @@ class BankTransactionModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     transfer_type=models.CharField(max_length=255,null=True)
     current_amount = models.BigIntegerField(default=0)
+    last_action = models.CharField(max_length=255,null=True)
+    by = models.CharField(max_length=255,null=True) 
 
 class BankTransactionHistory(models.Model):
     staff = models.ForeignKey(staff_details,on_delete=models.CASCADE,blank=True,null=True)
@@ -177,7 +179,7 @@ class BankTransactionHistory(models.Model):
     bank_trans = models.ForeignKey(BankTransactionModel,on_delete=models.CASCADE,blank=True,null=True)
     date = models.DateField(auto_now_add=True,null=True)
     action = models.CharField(max_length=255)
-    done_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
+    done_by = models.ForeignKey(staff_details,related_name='done_by_staff',on_delete=models.CASCADE,blank=True,null=True)
     done_by_name = models.CharField(max_length=255)
 
 #************************   ASHIKH V U (end) *************************

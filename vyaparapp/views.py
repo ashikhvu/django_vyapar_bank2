@@ -30,7 +30,7 @@ def homepage(request):
           }
   return render(request, 'company/homepage.html', context)
 
-# @login_required(login_url='login')
+#@login_required(login_url='login')
 def staffhome(request):
   if 'staff_id' in request.session:
     if request.session.has_key('staff_id'):
@@ -51,7 +51,7 @@ def staffhome(request):
 
 
 
-# @login_required(login_url='login')
+# #@login_required(login_url='login')
 def logout(request):
     auth.logout(request)
     return redirect('/')
@@ -755,7 +755,7 @@ def distributor_profile(request):
 
 # ========================================   ASHIKH V U (START) ======================================================
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_create(request):
   item_units = UnitModel.objects.filter(user=request.user.id)
   get_company_id_using_user_id = company.objects.get(user=request.user.id)
@@ -765,7 +765,7 @@ def item_create(request):
   return render(request,'company/item_create.html',{'item_units':item_units,
                                                     'allmodules':allmodules})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def items_list(request,pk):
   try:
     get_company_id_using_user_id = company.objects.get(user=request.user.id)
@@ -790,7 +790,7 @@ def items_list(request,pk):
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id.id,status='New')
     return render(request,'company/items_create_first_item.html',{"allmodules":allmodules})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_create_new(request):
   if request.method=='POST':
     user = User.objects.get(id=request.user.id)
@@ -843,7 +843,7 @@ def item_create_new(request):
   return redirect('item_create')
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_delete(request,pk):
   get_company_id_using_user_id = company.objects.get(user=request.user.id)
   item_to_delete = ItemModel.objects.get(id=pk)
@@ -851,7 +851,7 @@ def item_delete(request,pk):
   return redirect('items_list',pk=0)
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_view_or_edit(request,pk):
   item = ItemModel.objects.get(id=pk)
   item_units = UnitModel.objects.filter(user=request.user.id)
@@ -864,7 +864,7 @@ def item_view_or_edit(request,pk):
                                                           'allmodules':allmodules,})
 
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_unit_create(request):
   if request.method=='POST':
     user = User.objects.get(id=request.user.id)
@@ -875,7 +875,7 @@ def item_unit_create(request):
   return JsonResponse({'message':'asdasd'})
 
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_update(request,pk):
   if request.method=='POST':
     item_data = ItemModel.objects.get(id=pk)
@@ -932,7 +932,7 @@ def item_update(request,pk):
   return redirect('items_list',pk=item_data.id)
 
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_search_filter(request):
   search_string = request.POST.get('searching_item')
   items_filtered = ItemModel.objects.filter(user=request.user.id)
@@ -941,7 +941,7 @@ def item_search_filter(request):
   return TemplateResponse(request,'company/item_search_filter.html',{'all_items':items_filtered})
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_get_detail(request,pk):
   item = ItemModel.objects.get(id=pk)
   transactions = TransactionModel.objects.filter(user=request.user.id,item=item.id).order_by('-trans_created_date')
@@ -949,13 +949,13 @@ def item_get_detail(request,pk):
                                                                   'transactions':transactions,})
 
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_get_details_for_modal_target(request,pk):
   item = ItemModel.objects.get(id=pk)
   return TemplateResponse(request,'company/item_get_details_for_modal_target.html',{"item":item,})
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def ajust_quantity(request,pk):
   if request.method=='POST':
     item = ItemModel.objects.get(id=pk)
@@ -990,7 +990,7 @@ def ajust_quantity(request,pk):
   return redirect('items_list',pk=item.id)
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def transaction_delete(request,pk):
   transaction = TransactionModel.objects.get(id=pk)
   item = ItemModel.objects.get(id=transaction.item_id)
@@ -1011,7 +1011,7 @@ def transaction_delete(request,pk):
   return redirect('items_list',pk=item.id)
 
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_transaction_view_or_edit(request,pk,tran):
   item = ItemModel.objects.get(id=pk)
   transaction = TransactionModel.objects.get(id=tran)
@@ -1020,7 +1020,7 @@ def item_transaction_view_or_edit(request,pk,tran):
                                                                                 "transaction":transaction,})
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def update_adjusted_transaction(request,pk,tran):
   item = ItemModel.objects.get(id=pk)
   transaction = TransactionModel.objects.get(id=tran)
@@ -1066,7 +1066,7 @@ def update_adjusted_transaction(request,pk,tran):
     transaction.save()
   return redirect('items_list',pk=item.id)
   
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def item_delete_open_stk(request,pk):
   item = ItemModel.objects.get(id=pk)
   if item.item_opening_stock > item.item_current_stock:
@@ -1188,7 +1188,7 @@ def deleteparty(request,id):
 
 #End
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def adminhome(request):
  
   
@@ -1217,7 +1217,7 @@ def validate_ifsc(ifsc_code):
     else:
         return False
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def account_num_check(request):
   if request.method=='POST':
     bank_name = request.POST.get('bank_name')
@@ -1232,7 +1232,7 @@ def account_num_check(request):
       return HttpResponse('<small><span class="tr fs-2">Account Number is not valid</span></small>')
   return HttpResponse('')
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def account_num_check_for_edit(request,pk):
   if request.method=='POST':
     bank_name = request.POST.get('bank_name')
@@ -1247,7 +1247,7 @@ def account_num_check_for_edit(request,pk):
       return HttpResponse('<small><span class="tr fs-2">Account Number is not valid</span></small>')
   return HttpResponse('')
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_ifsc_check (request):
   if request.method=='POST':
     bank_ifsc = request.POST.get('ifsc')
@@ -1259,49 +1259,42 @@ def bank_ifsc_check (request):
       return HttpResponse('<small><span class="tr fs-2">IFSC Code is not valid</span></small>')
   return HttpResponse('')
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_create(request):
+  print('asdasd')
   try:
     staff_id = request.session['staff_id']
+    print(staff_id)
     staff =  staff_details.objects.get(id=staff_id)
-    # get_company_id_using_user_id = company.objects.get(user=staff.company.id)
+    get_company_id_using_user_id = company.objects.get(user=staff.company.id)
     # permission
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     # permission
     return render(request,'company/bank_create.html',{"allmodules":allmodules})
   except:
     user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+    get_company_id_using_user_id = company.objects.get(user=user)
     # permission
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     # permission
     return render(request,'company/bank_create.html',{"allmodules":allmodules})
 
-@login_required(login_url='login')
+
+#@login_required(login_url='login')
 def banks_list(request,pk):
+  
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
  
-  try:
-    staff_id = request.session['staff_id']
-    staff =  staff_details.objects.get(id=staff_id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
-    # permission
-    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
-    # permission
-  except:
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
-    # permission
-    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
-    # permission
 
   try:
     all_banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
     if pk == 0:
       first_bank = all_banks.first()
-      transactions_all = BankTransactionModel.objects.filter(company=get_company_id_using_user_id.id)
-      transactions = transactions_all.filter(Q(from_here=first_bank) | Q(to_here=first_bank))
-      tr_history = BankTransactionHistory.objects.filter().order_by('date')
-      print(tr_history)
+      print(all_banks)
       return redirect('banks_list',pk=first_bank.id)
     else:
       first_bank = all_banks.get(id=pk)
@@ -1309,48 +1302,80 @@ def banks_list(request,pk):
       transactions = transactions_all.filter(Q(from_here=pk) | Q(to_here=pk))
       tr_history = BankTransactionHistory.objects.filter().order_by('date')
     if all_banks.exists():
+      open_bal_last_edited = BankTransactionHistory.objects.filter(Q(action__contains='BANK OPEN BALANCE CREATED') | Q(action__contains='BANK OPEN BALANCE UPDATED')).last()
       return render(request,'company/banks_list.html',{"allmodules":allmodules,
                                                       "all_banks":all_banks,
                                                       "bank":first_bank,
                                                       "transactions":transactions,
-                                                      "tr_history":tr_history}) 
+                                                      "tr_history":tr_history,
+                                                      "open_bal_last_edited":open_bal_last_edited,
+                                                      "staff":staff}) 
     else:
       return render(request,'company/bank_create_first_bank.html',{"allmodules":allmodules,}) 
   except:
     return render(request,'company/bank_create_first_bank.html',{"allmodules":allmodules,}) 
     
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def get_bank_to_bank(request):
-  banks = BankModel.objects.filter(user=request.user.id)
+
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
+  banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
   return TemplateResponse(request,'company/bank_bank_to_bank.html',{'banks':banks})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def get_bank_to_cash(request):
-  banks = BankModel.objects.filter(user=request.user.id)
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
+  banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
   return TemplateResponse(request,'company/bank_bank_to_cash.html',{'banks':banks})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def get_cash_to_bank(request):
-  banks = BankModel.objects.filter(user=request.user.id)
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
+  banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
   return TemplateResponse(request,'company/bank_cash_to_bank.html',{'banks':banks})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def get_adjust_bank_balance(request):
-  banks = BankModel.objects.filter(user=request.user.id)
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
+  banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
   return TemplateResponse(request,'company/bank_adjust_bank_balance.html',{'banks':banks})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_create_new(request):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
 
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    print(get_company_id_using_user_id)
     bank_name = request.POST.get('bank_name')
     account_num = request.POST['account_num']
     bank_name = request.POST.get('bank_name')
     account_num = request.POST['account_num']
-    if BankModel.objects.exclude(company=request.user.id).filter(bank_name=bank_name,user=request.user.id,account_num=account_num).exists():
+    if BankModel.objects.exclude(company=get_company_id_using_user_id.id).filter(bank_name=bank_name,user=user.id,account_num=account_num).exists():
       parmission_var = 0
     else:
       parmission_var = 1
@@ -1393,14 +1418,14 @@ def bank_create_new(request):
           tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                               bank=bank_data,
                                               action="BANK CREATION : "+bank_data.bank_name.upper(),
-                                              done_by_name=request.user.first_name,
-                                              done_by=request.user)
+                                              done_by_name=staff.first_name,
+                                              done_by=staff)
           tr_history.save()
           tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                               bank=bank_data,
-                                              action="BANK OPEN BALANCE CREATED : "+str(bank_data.open_balance),
-                                              done_by_name=request.user.first_name,
-                                              done_by=request.user)
+                                              action="BANK OPEN BALANCE CREATED",
+                                              done_by_name=staff.first_name,
+                                              done_by=staff)
           tr_history.save()
           if request.POST.get('save_and_next'):
             messages.success(request,'Bank created successfully')
@@ -1418,22 +1443,27 @@ def bank_create_new(request):
       return redirect('bank_create')
   return redirect('banks_list',pk=bank_data.id)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_delete(request,pk):
   bank = BankModel.objects.get(id=pk)
   bank.delete()
   return redirect('banks_list',pk=0)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_view_or_edit(request,pk):
   bank = BankModel.objects.get(id=pk)
   return render(request,'company/bank_view_or_edit.html',{"bank":bank})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_update(request,pk):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+    
     bank_data = BankModel.objects.get(id=pk)
 
     bank_name = request.POST.get('bank_name')
@@ -1483,9 +1513,23 @@ def bank_update(request,pk):
           elif int(bank_data.open_balance) > int(open_balance):
             bank_data.current_balance = int(bank_data.current_balance)- (int(bank_data.open_balance) - int(open_balance))
 
+          if bank_data.open_balance != open_balance:
+            validity = True
+          else:
+            validity = False
+          old_val = bank_data.open_balance
+
           bank_data.open_balance = open_balance
           bank_data.user = user
           bank_data.save()
+
+          if validity == True:
+            tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                          bank=bank_data,
+                                          action="BANK OPEN BALANCE UPDATED",
+                                          done_by_name=staff.first_name,
+                                          done_by=staff)
+            tr_history.save()
         else:
           messages.error(request,'IFSC CODE is not valid')
           return redirect('bank_create')
@@ -1498,19 +1542,24 @@ def bank_update(request,pk):
   return redirect('banks_list',pk=bank_data.id)
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_to_bank_transaction_create(request):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
     select1 = request.POST.get('from_here')
     from_here = BankModel.objects.get(id=select1)
     select2 = request.POST.get('to_here')
     to_here = BankModel.objects.get(id=select2)
     type = "BANK TO BANK"
-    name = request.user.first_name
+    name = staff.first_name
     amount = request.POST.get('amount')
-    date = request.POST.get('date') 
+    date = request.POST.get('date')
     
     bank1 = BankModel.objects.get(id=from_here.id)
     bank1.current_balance -= int(amount)
@@ -1527,26 +1576,33 @@ def bank_to_bank_transaction_create(request):
                                         date=date,
                                         name=name,
                                         amount=amount,
+                                        last_action='CREATED',
+                                        by = staff.first_name,
                                         )
     transaction_data.save()
     tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                         bank=bank1,
                                         bank_trans=transaction_data,
-                                        action="BANK TO BANK TRANSACTION CREATED : "+amount+" Rs",
-                                        done_by_name=request.user.first_name,
-                                        done_by=request.user)
+                                        action="BANK TO BANK TRANSACTION CREATED",
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
     tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def bank_to_cash_transaction_create(request):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
     select1 = request.POST.get('from_here')
     from_here = BankModel.objects.get(id=select1)
     type = "Cash Withdraw"
-    name = request.user.first_name
+    name = staff.first_name
     amount = request.POST.get('amount')
     date = request.POST.get('date') 
     
@@ -1561,27 +1617,34 @@ def bank_to_cash_transaction_create(request):
                                         name=name,
                                         amount=amount,
                                         date=date,
+                                        last_action='CREATED',
+                                        by = staff.first_name,
                                         )
     transaction_data.save()
     tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                         bank=bank1,
                                         bank_trans=transaction_data,
-                                        action="BANK TO CASH TRANSACTION CREATED : "+amount+" Rs",
+                                        action="BANK TO CASH TRANSACTION CREATED",
                                         date=date,
-                                        done_by_name=request.user.first_name,
-                                        done_by=request.user)
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
     tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def cash_to_bank_transaction_create(request):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
     select2 = request.POST.get('to_here')
     to_here = BankModel.objects.get(id=select2)
     type = "Cash Deposit"
-    name = request.user.first_name
+    name = staff.first_name
     amount = request.POST.get('amount')
     date = request.POST.get('date') 
     
@@ -1596,28 +1659,35 @@ def cash_to_bank_transaction_create(request):
                                         name=name,
                                         amount=amount,
                                         date=date,
+                                        last_action='CREATED',
+                                        by = staff.first_name,
                                         )
     transaction_data.save()
     tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                         bank=bank2,
                                         bank_trans=transaction_data,
-                                        action="CASH TO BANK TRANSACTION CREATED : "+amount+" Rs",
+                                        action="CASH TO BANK TRANSACTION CREATED",
                                         date=date,
-                                        done_by_name=request.user.first_name,
-                                        done_by=request.user)
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
     tr_history.save()
   return redirect('banks_list',pk=to_here.id)
 
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def get_adjust_bank_balance_create(request):
   if request.method=="POST":
-    user = User.objects.get(id=request.user.id)
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
     select1 = request.POST.get('from_here')
     from_here = BankModel.objects.get(id=select1)
     inc_red = request.POST.get('inc_red')
-    name = request.user.first_name
+    name = staff.first_name
     amount = request.POST.get('amount')
     date = request.POST.get('date') 
     
@@ -1637,18 +1707,20 @@ def get_adjust_bank_balance_create(request):
                                         name=name,
                                         amount=amount,
                                         date=date,
+                                        last_action='CREATED',
+                                        by = staff.first_name,
                                         )
     transaction_data.save()
     tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
                                         bank=bank1,
                                         bank_trans=transaction_data,
-                                        action="BANK BALANCE "+type.upper()+" : "+amount+" Rs",
-                                        done_by_name=request.user.first_name,
-                                        done_by=request.user)
+                                        action="BANK BALANCE "+type.upper(),
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
     tr_history.save()
   return redirect('banks_list',pk=from_here.id)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def delete_bank_open_balance(request,pk):
   bank = BankModel.objects.get(id=pk)
   bank.current_balance = bank.current_balance - bank.open_balance
@@ -1656,7 +1728,7 @@ def delete_bank_open_balance(request,pk):
   bank.save()
   return redirect('banks_list',pk=pk)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def delete_bank_transaction(request,pk,bank_id):
   print(pk,bank_id)
   try:
@@ -1708,10 +1780,17 @@ def delete_bank_transaction(request,pk,bank_id):
     return redirect('banks_list',pk=bank_id)
   return redirect('banks_list',pk=0)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def view_or_edit_bank_transaction(request,pk,bank_id):
+
+  staff_id = request.session['staff_id']
+  staff =  staff_details.objects.get(id=staff_id)
+  get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+  user = get_company_id_using_user_id.user
+  allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
   transaction = BankTransactionModel.objects.get(id=pk)
-  banks = BankModel.objects.filter(user=request.user.id)
+  banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
   bank = BankModel.objects.get(id=bank_id)
   if transaction.type == "BANK TO BANK" or transaction.type == 'Bank to bank':
     return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_to_bank_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
@@ -1722,9 +1801,16 @@ def view_or_edit_bank_transaction(request,pk,bank_id):
   elif transaction.type == 'Adjustment Increase' or transaction.type == 'Adjustment increase' or transaction.type == 'Adjustment Reduce' or transaction.type == 'Adjustment reduce' or transaction.type == 'ADJUSTMENT INCREASE' or transaction.type == 'ADJUSTMENT REDUCE':
     return TemplateResponse(request,'company/bank_transaction_view_or_edit/bank_adjust_bank_balance_view_or_edit.html',{"transaction":transaction,"banks":banks,"bank":bank})
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def update_bank_transaction(request,pk,bank_id):
   if request.method=="POST":
+
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
+
     amount = request.POST.get('amount')
     date = request.POST.get('date')
     trans = BankTransactionModel.objects.get(id=pk)
@@ -1742,8 +1828,23 @@ def update_bank_transaction(request,pk,bank_id):
       else:
         bank2.current_balance += (int(amount)-trans.amount)
       bank2.save()
+      old_amount = trans.amount
+      if old_amount != amount:
+        validity =True
+      else:
+        validity =False
       trans.amount = amount
       trans.save()
+      if validity == True:
+        tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                          bank_trans=trans,
+                                          action="BANK TO BANK TRANSACTION UPDATED",
+                                          done_by_name=staff.first_name,
+                                          done_by=staff)
+        tr_history.save()
+        trans.last_action='UPDATED'
+        trans.by = staff.first_name
+        trans.save()
       return redirect('banks_list',pk=bank_id)
     elif trans.type == 'Cash Withdraw' or trans.type == 'CASH WITHDRAW':
       bank1 = BankModel.objects.get(id=trans.from_here.id)
@@ -1753,6 +1854,15 @@ def update_bank_transaction(request,pk,bank_id):
         bank1.current_balance -= (int(amount)-trans.amount)
       bank1.save()
       trans.amount = amount
+      trans.save()
+      tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                          bank_trans=trans,
+                                          action="BANK TO CASH TRANSACTION UPDATED",
+                                          done_by_name=staff.first_name,
+                                          done_by=staff)
+      tr_history.save()
+      trans.last_action='UPDATED'
+      trans.by = staff.first_name
       trans.save()
       return redirect('banks_list',pk=trans.from_here.id)
     elif trans.type == 'Cash Deposit'  or trans.type == 'CASH DEPOSIT':
@@ -1791,7 +1901,7 @@ def update_bank_transaction(request,pk,bank_id):
 from openpyxl import load_workbook
 from django.utils import timezone
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def import_from_excel(request,pk):
     current_datetime = timezone.now()
     date =  current_datetime.date()
@@ -1895,28 +2005,32 @@ def import_from_excel(request,pk):
               transaction.save()
     return redirect('banks_list',pk=pk)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def transaction_history(request,pk,bank_id):
-    get_company_id_using_user_id = company.objects.get(user=request.user.id)
-    # permission
+    
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
-    # permission
-    all_banks = BankModel.objects.filter(user=request.user.id)
+
+    all_banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
 
     tr_history1 = BankTransactionHistory.objects.filter(action__contains='BANK CREATION',bank=bank_id)
-    tr_history2 = BankTransactionHistory.objects.filter(action__contains='BANK OPEN BALANCE CREATED',bank=bank_id)    
+    tr_history2 = BankTransactionHistory.objects.filter(Q(action__contains='BANK OPEN BALANCE CREATED') | Q(action__contains='BANK OPEN BALANCE UPDATED'),bank=bank_id)    
     tr_history = BankTransactionHistory.objects.filter(bank_trans=pk)
-    print(tr_history,'\n',tr_history1)
+    # print(tr_history,'\n',tr_history1)
     if pk != 0:
       tr_historys = tr_history | tr_history1
     else:
       tr_historys = tr_history1 | tr_history1 | tr_history2
-    print(tr_history)
+    # print(tr_history)
     
     return render(request,'company/bank_transaction_history.html',{"allmodules":allmodules,
                                                                    "all_banks":all_banks,
                                                                     "tr_historys":tr_historys,
-                                                                    "bank_id":bank_id})
+                                                                    "bank_id":bank_id,
+                                                                    })
 
 
 #******************************************   ASHIKH V U (end) ****************************************************

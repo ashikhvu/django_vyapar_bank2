@@ -81,7 +81,7 @@
         <div class="col-sm-12 col-lg-12  ps-2 pe-3 pb-2" style="height: 50rem;">
             <div class="position-relative" style="z-index: 10;">
                 <div class="position-absolute end-0">
-                  <div class="d-flex pt-3 pe-3">
+                  <div class="d-flex pt-3 pe-3" style="margin-top: -0.4rem;">
                     <a href="{% url 'banks_list' bank_id %}"><span class="fa fa-times-circle fs-5 tb close_pad"></span></a>
                   </div>
                 </div>
@@ -102,7 +102,7 @@
                                         <tr>
                                             <td class="text-center tb">{{ i.date }}</td>
                                             <td class="text-center tb">{{ i.action }}</td>
-                                            <td class="text-center tb">{{ i.done_by|capfirst }}</td>
+                                            <td class="text-center tb">{{ i.done_by_name|capfirst }}</td>
                                         </tr>
                                         {% endfor %}
                                     {% else %}
