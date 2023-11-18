@@ -78,7 +78,7 @@
                 <hr class="p-0 m-0">
                 <div style="background-color: rgba(0, 195, 255, 0.205);" class="p-3 pb-0 mb-0">
                     <div class="row pb-0 mb-0">
-                        <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class=" fs-4 text-dark" style="font-weight: 900;" href="">BANKS</a></div>
+                        <div class="col text-center pb-2" style="border-bottom: 3px solid rgba(0, 0, 0, 0.548);"><a class=" fs-4 text-dark" style="font-weight: 900;" href="">{{ bank.bank_name }} BANK - TRANSACTION STATEMENT</a></div>
                         <!-- <div class="col text-center pb-2" style="border-bottom: 3px solid transparent;"><a class="fw-bolder fs-4" style="color: gray;" href="">FIELD1</a></div>
                         <div class="col text-center pb-2" style="border-bottom: 3px solid transparent;"><a class="fw-bolder fs-4" style="color: gray;" href="">FIELD2</a></div>
                         <div class="col text-center pb-2" style="border-bottom: 3px solid transparent;"><a class="fw-bolder fs-4" style="color: gray;" href="">FIELD3</a></div> -->
@@ -89,135 +89,22 @@
     </div>
     <br>
     <div class="row ps-3 pe-3 m-0">
-        <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 50rem;">
-            <div class="card bg-light bs"style="height:100%;">
-                <div class="row m-0">
-                    <div class="col-12 p-4 pt-3" style="z-index:2">
-                        <form action="" method="post">
-                            {% csrf_token %}
-                            <div class="d-flex justify-content-between">
-                                <span id="search_item" class="fa fa-search tb bg-info text-light ms-2 mt-1" style="border-radius: 50%;padding: 0.77rem;"></span>
-                                <a id="add_item_btn" class="btn btn-sm rounded p-2 mt-1 btn_add" href="{% url 'bank_create' %}"><span class="fa fa-plus"></span> Add Bank</a>
-                            </div>
-                            <div class="position-relative">
-                                <div class="position-absolute end-0" style="margin-top:0.5rem;margin-right:0.7rem">
-                                    <span hidden id="close_seacrh" class="fa fa-times fs-4 tr"></span>
-                                </div>
-                            </div>
-                        
-                            <input hidden id="search_item_input" class="form-control border-dark text-dark" type="text" placeholder="search here.." name="searching_item">
-                        </form>
-                    </div>
-                    <div class="ps-3 pe-3">
-                        <hr class="p-0 m-0">
-                    </div>
-                    <div class="col-12 p-3 pt-0">
-                        {% if all_banks %}
-                        <div id="item_search_filter_target">
-                            <form action="" method="post">
-                                {% csrf_token %}
-
-                                <div style="overflow: auto;height: 42rem;">
-                                <table id="table1" class="table w-100 table-light table-striped table-hover">
-                                    <thead class="bg-primary">
-                                        <th class="text-start fs-2 tb">ACCOUNT NAME</th>
-                                        <th class="text-end fs-2 tb">AMOUNT</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for i in all_banks %}
-                                        <tr class="item_lists_hide">
-                                            <td style="cursor:pointer" class="text-start fs-2 fw-bold text-dark"><a style="color: black;font-weight: 500;" href="{% url 'banks_list' i.id %}">{{ i.bank_name|upper }}</a></td>
-                                            <td class="text-end pe-0 me-0 fs-2 fw-bolder" style="color: green;">
-                                                <span class="amount_truncate">{{ i.current_balance }}</span>
-                                                <div class="btn-group mb-1">
-                                                    <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span class="fa fa-ellipsis-v text-dark fs-1 ps-0"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item fw-bold tb" href="{% url 'bank_view_or_edit' i.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                    <li><a class="dropdown-item fw-bold tb" type="button" onclick="confirm_delete({{ i.id }})"><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                </div>
-
-                            </form>
-                        </div>
-                        {% else %}
-                        <div class="text-center mt-2">
-                            <small>Currently no Banks are available</small>
-                        </div>
-                        {% endif %}
-                    </div>
-                   
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-lg-9  ps-2 pe-3" style="height: 80%;">
+        <div class="col-sm-12 col-lg-12  ps-2 pe-3" style="height: 80%;">
           <div id="bank_get_detail_target">
-            <div class="row m-0" style="height:20%">
-                <div class="card bg-light bs p-3 mb-3">
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">{{ bank.bank_name|upper }} <span class="fa fa-share ps-1 tb"></span></p>
-                        <div class="btn-group mb-1">
-                            <button class="btn btn-sm btn-primary fs-2" style="border-radius: 5px;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="fa fa-sliders-h pe-1"></span> 
-                                <span>DEPOSIT / WITHDRAW</span> <span class="fa fa-caret-down ps-2"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                            <li 
-                            hx-get="{% url 'get_bank_to_bank' %}"
-                            hx-trigger="click delay:0s"
-                            hx-target="#bank_modal_get_details"
-                            >
-                                <a class="dropdown-item fw-bold tb color_change" href="" data-bs-target="#myModal1" data-bs-toggle="modal"> BANK TO BANK</a></li>
-                            <li
-                            hx-get="{% url 'get_bank_to_cash' %}"
-                            hx-trigger="click delay:0s"
-                            hx-target="#bank_modal_get_details"
-                            >
-                            <a class="dropdown-item fw-bold tb color_change" href="" data-bs-target="#myModal1" data-bs-toggle="modal"> BANK TO CASH</a></li>
-                            <li
-                            hx-get="{% url 'get_cash_to_bank' %}"
-                            hx-trigger="click delay:0s"
-                            hx-target="#bank_modal_get_details"
-                            ><a class="dropdown-item fw-bold tb color_change" type="button" data-bs-target="#myModal1" data-bs-toggle="modal"> CASH TO BANK</a></li>
-
-                            <li
-                            hx-get="{% url 'get_adjust_bank_balance' %}"
-                            hx-trigger="click delay:0s"
-                            hx-target="#bank_modal_get_details"
-                            ><a class="dropdown-item fw-bold tb color_change" href="" type="button" data-bs-target="#myModal1" data-bs-toggle="modal"> ADJUST BANK BALANCE</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <p></p>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">ACCOUNT NUMBER  <span class="ps-2 tg">{{ bank.account_num }}</span></p>
-                        <!-- <p class="tb fw-bolder fs-2">STOCK QUANTITY  <span class="ps-2 tg"></span></p> -->
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">IFSC CODE  <span class="ps-2 tg">{{ bank.ifsc|upper }}</span></p>
-                        
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p class="tb fw-bolder fs-2">UPI ID  <span class="ps-2 tg">{% if bank.upi_id %}{{ bank.upi_id }}{% else %}Nill{% endif %}</span></p>
-                        <p class="tb fw-bolder fs-2">BALANCE  <span class="ps-2 tg">₹ {{ bank.current_balance }}</span></p>
-                    </div>
-                </div>
-            </div>
+            
             <!-- <div class="row" style="height: 0.5rem;"></div> -->
             <div class="row pt-0 m-0" style="height:39rem;">
                 <div class="card p-0 bg-light bs">
                     <div class="row m-0 p-0 pt-3">
-                        <div class="col-sm-12 col-lg-3">
-                            <p class="tb fw-bolder pt-2">TRANSACTIONS</p>
+                        <div class="col-sm-12 col-lg-5">
+                            <div class="d-flex">
+                                <label class="tb fw-normal pt-2">FROM</label>
+                                <input class="p-1 m-1" style="border-radius: 5px;border: 1px solid rgba(0, 0, 0, 0.272);" type="date">
+                                <label class="tb fw-normal pt-2">TO</label>
+                                <input class="p-1 m-1" style="border-radius: 5px;border: 1px solid rgba(0, 0, 0, 0.272);" type="date">
+                            </div>
                         </div>
-                        <div class="col-sm-12 col-lg-3">
+                        <div class="col-sm-12 col-lg-1">
                             
                         </div>
                         
@@ -250,6 +137,7 @@
                                         <th class="text-center fs-2">NAME <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">DATE <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">AMOUNT <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2">BALANCE <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">ACTION <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2">BY <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center p-0 m-0 hide_this_for_print"></th>
@@ -268,6 +156,7 @@
                                             <td class="text-center">Opening Blance</td>
                                             <td class="text-center">{{ bank.as_of_date|date:"Y-m-d" }}</td>
                                             <td class="text-center fw-bolder">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
+                                            <td class="text-center show_bank_id"></td>
                                             <td class="text-center fw-bolder">{% if open_bal_last_edited.action == 'BANK OPEN BALANCE CREATED' %}CREATED{% else %}UPDATED{% endif %}</td>
                                             <td class="text-center fw-bolder">{{ open_bal_last_edited.done_by_name|capfirst }}</td>
                                             <td class="p-0 pt-1 m-0 hide_this_for_print">
@@ -325,6 +214,7 @@
                                                         <p class="p_green pgreen">+ ₹{{ i.amount }}</p>
                                                     {% endif %}
                                                 </td>
+                                                <td class="text-center fw-bolder"></td>
                                                 <td class="text-center fw-bolder">{{ i.last_action }}</td>
                                                 <td class="text-center fw-bolder tb">{{ i.by|capfirst }}</td>
                                                 <td class="p-0 pt-1 m-0 hide_this_for_print">
@@ -643,7 +533,7 @@
                 }
             `);
             iframe.contentDocument.write('</style>');
-            iframe.contentDocument.write('</head><body><br><h1 style="text-align:center;font-weight:lighter">Transactions</h1><br>' + printableContent + '</body></html>');
+            iframe.contentDocument.write('</head><body><br><h2 style="text-align-center">TRANSACTION STATEMENT</h2><p></p><h3 style="text-align:center;font-weight:bolder">{{ bank.bank_name }} BANK</h3><br>' + printableContent + '</body></html>');
             iframe.contentDocument.close();
     
         
