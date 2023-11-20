@@ -1412,7 +1412,7 @@ def bank_create_new(request):
     
     if open_balance == '' or open_balance == None:
       open_balance = 0
-    if card_type == "DEBIT":
+    if card_type == "CREDIT":
       open_balance = int(open_balance)*-1
       
     if parmission_var == 1:
@@ -1507,7 +1507,7 @@ def bank_update(request,pk):
     
     if open_balance == '' or open_balance == None:
       open_balance = 0
-    if card_type == "DEBIT":
+    if card_type == "CREDIT":
       open_balance = int(open_balance)*-1
     if parmission_var == 1:
       if parmission_var1 == 1:
@@ -2147,7 +2147,8 @@ def import_statement_from_excel(request,pk):
         ws = wb.active
 
         for row in ws.iter_rows(min_row=2, values_only=True):
-            TYPE, FROM, TO,NAME,DATE,AMOUNT,BALANCE,ACTION,BY = row
+            TYPE, FROM, TO,NAME,DATE,AMOUNT,BALANCE = row
+            # TYPE, FROM, TO,NAME,DATE,AMOUNT,BALANCE,ACTION,BY = row
 
             if TYPE != None:
               TYPE = TYPE.upper()
