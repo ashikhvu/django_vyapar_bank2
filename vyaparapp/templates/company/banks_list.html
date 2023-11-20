@@ -64,6 +64,74 @@
     }
 </style>
 
+<style>
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+        }
+
+        .dropdown-toggle {
+        padding: 10px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        }
+
+        .dropdown-content {
+        z-index: 1;
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: -95px;
+        background-color: #b4b4b450;
+        backdrop-filter: blur(5px);
+        padding: 10px;
+        border: 1px solid #3498db;
+        border-radius: 5px;
+        box-shadow: 3px 5px 5px 5px rgba(0, 0, 0, 0.201);
+        }
+
+        .dropdown-content input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        background-color: white;
+        border-radius: 5px;
+        border: 1px solid rgb(168, 168, 168);
+        }
+
+        .dropdown-content button {
+        padding: 8px 15px;
+        background-color: rgb(0, 154, 108);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+        }
+
+        .custom-dropdown .dropdown-content .cls{
+            position: absolute;
+            right: -7px;
+            top: -7px;
+            padding: 3px 5px;
+            color: white;
+            text-shadow: 0px 0px 2px black ;
+            border-radius: 50%;
+            font-size: 15px;
+            background-color: rgba(255, 0, 0, 0.424);
+        }
+        .custom-dropdown .dropdown-content .title
+        {
+            background-color: rgb(255, 255, 255);
+            font-weight: 500;
+            color: rgb(0, 0, 0);
+            text-shadow: 0px 0px 20px rgb(255, 255, 255);
+            padding: 5px;
+            border-radius: 5px;
+        }
+</style>
+
 <div class="body-wrapper">
     <br><br><br>
     <div class="row p-0 m-0">
@@ -88,6 +156,31 @@
         </div>
     </div>
     <br>
+    {% if messages %}
+    {% for i in messages %}
+      {% if i.tags == 'warning' %}
+      <div class="alert alert-warning alert-dismissible fade show ms-4" style="margin-right: 2rem;" role="alert">
+        <strong>WARNING:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'info' %}
+      <div class="alert alert-info alert-dismissible fade show ms-4" style="margin-right: 2rem;" role="alert">
+        <strong>INFO:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'success' %}
+      <div class="alert alert-success alert-dismissible fade show ms-4" style="margin-right: 2rem;" role="alert">
+        <strong>SUCCESS:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'error' %}
+      <div class="alert bg-danger alert-dismissible fade show ms-4" style="margin-right: 2rem;" role="alert">
+        <strong>ERROR:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
     <div class="row ps-3 pe-3 m-0">
         <div class="col-sm-12 col-lg-3  ps-2 pe-3 pb-2" style="height: 50rem;">
             <div class="card bg-light bs"style="height:100%;">
@@ -244,14 +337,98 @@
                                 <table id="myTable" class="table table-bordered table-info table-striped tb table-responsive w-100">
                                     <thead>
                                         <th class="text-center fs-2 hide_field">#</th>
-                                        <th class="text-center fs-2">TYPE <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2">
+                                            TYPE 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown1()"></span>
+                                                <div class="dropdown-content dd1">
+                                                  <span onclick="toggleDropdown1()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd1_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input1()">CLEAR</button>
+                                                    <button onclick="handleButtonClick1()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
                                         <th class="text-center fs-2 show_bank_id" hidden>FROM <span class="fa fa-filter ps-1 fs-1"></span></th>
                                         <th class="text-center fs-2 show_bank_id" hidden>TO <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                        <th class="text-center fs-2">NAME <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                        <th class="text-center fs-2">DATE <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                        <th class="text-center fs-2">AMOUNT <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                        <th class="text-center fs-2">ACTION <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                        <th class="text-center fs-2">BY <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                        <th class="text-center fs-2">
+                                            NAME 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown2()"></span>
+                                                <div style="display: none;" class="dropdown-content dd2">
+                                                  <span onclick="toggleDropdown2()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd2_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input2()">CLEAR</button>
+                                                    <button onclick="handleButtonClick2()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
+                                        <th class="text-center fs-2">
+                                            DATE 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown3()"></span>
+                                                <div style="display: none;" class="dropdown-content dd3">
+                                                  <span onclick="toggleDropdown3()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd3_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input3()">CLEAR</button>
+                                                    <button onclick="handleButtonClick3()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
+                                        <th class="text-center fs-2">
+                                            AMOUNT 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown4()"></span>
+                                                <div style="display: none;" class="dropdown-content dd4">
+                                                  <span onclick="toggleDropdown4()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd4_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input4()">CLEAR</button>
+                                                    <button onclick="handleButtonClick4()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
+                                        <th class="text-center fs-2">
+                                            ACTION 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown6()"></span>
+                                                <div style="display: none;" class="dropdown-content dd6">
+                                                  <span onclick="toggleDropdown6()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd6_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input6()">CLEAR</button>
+                                                    <button onclick="handleButtonClick6()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
+                                        <th class="text-center fs-2">
+                                            BY 
+                                            <div class="custom-dropdown">
+                                                <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown7()"></span>
+                                                <div style="display: none;" class="dropdown-content dd7">
+                                                  <span onclick="toggleDropdown7()" class="fa fa-times cls"></span>
+                                                  <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
+                                                  <input id="dd7_input" type="text" placeholder="Enter something...">
+                                                  <div class="d-flex">
+                                                    <button class="me-2" onclick="clear_input7()">CLEAR</button>
+                                                    <button onclick="handleButtonClick7()">SUBMIT</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                        </th>
                                         <th class="text-center p-0 m-0 hide_this_for_print"></th>
                                     </thead>
                                     <tbody>
@@ -262,14 +439,14 @@
                                                     <div style="width: 10px;height: 10px;" class="bg-dark rounded-pill bs_sm"></div>
                                                 </div>
                                             </td>
-                                            <td class="text-center">Open. Balance</td>
+                                            <td class="text-center td_type">Open. Balance</td>
                                             <td class="text-center show_bank_id" hidden>{{ bank.id }}</td>
                                             <td class="text-center show_bank_id" hidden></td>
-                                            <td class="text-center">Opening Blance</td>
-                                            <td class="text-center">{{ bank.as_of_date|date:"Y-m-d" }}</td>
-                                            <td class="text-center fw-bolder">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
-                                            <td class="text-center fw-bolder">{% if open_bal_last_edited.action == 'BANK OPEN BALANCE CREATED' %}CREATED{% else %}UPDATED{% endif %}</td>
-                                            <td class="text-center fw-bolder">{{ open_bal_last_edited.done_by_name|capfirst }}</td>
+                                            <td class="text-center td_name">Opening Blance</td>
+                                            <td class="text-center td_date">{{ bank.as_of_date|date:"Y-m-d" }}</td>
+                                            <td class="text-center fw-bolder td_amount">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
+                                            <td class="text-center fw-bolder td_action">{% if open_bal_last_edited.action == 'BANK OPEN BALANCE CREATED' %}CREATED{% else %}UPDATED{% endif %}</td>
+                                            <td class="text-center fw-bolder td_by">{{ open_bal_last_edited.done_by_name|capfirst }}</td>
                                             <td class="p-0 pt-1 m-0 hide_this_for_print">
                                                 <div class="btn-group mb-1">
                                                     <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -291,10 +468,10 @@
                                                         <div style="width: 10px;height: 10px;box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.205);border-radius: 50%;" {% if forloop.counter|mod:10 == 0 %}class="bg-success"{% elif forloop.counter|mod:10 == 1 %}class="bg-warning"{% elif forloop.counter|mod:10 == 2 %}class="bg-danger"{% elif forloop.counter|mod:10 == 3 %}class="bg-success"{% elif forloop.counter|mod:10 == 4 %}class="bg-info"{% elif forloop.counter|mod:10 == 5 %}class="bg-primary"{% elif forloop.counter|mod:10 == 6 %}class="bg-secondary"{% elif forloop.counter|mod:10 == 7 %}class="bg-warning"{% elif forloop.counter|mod:10 == 8 %}class="bg-danger"{% else %}class="bg-pink"{% endif %}></div>
                                                     </div>
                                                 </td>
-                                                <td class="text-center">{{ i.type|lower|capfirst }}</td>
+                                                <td class="text-center td_type">{{ i.type|lower|capfirst }}</td>
                                                 <td class="text-center show_bank_id" hidden>{{ i.from_here.id }}</td>
                                                 <td class="text-center show_bank_id" hidden>{{ i.to_here.id }}</td>
-                                                <td class="text-center">
+                                                <td class="text-center td_name">
                                                     {% if i.type == 'Cash Deposit' or i.type == 'CASH DEPOSIT' %}
                                                         Cash Deposit
                                                     {% elif i.type == 'Cash Withdraw' or i.type == 'CASH WITHDRAW' %}
@@ -311,22 +488,22 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 </td>
-                                                <td class="text-center">{{ i.date|date:"Y-m-d" }}</td>
-                                                <td class="text-center fw-bolder">
+                                                <td class="text-center td_date">{{ i.date|date:"Y-m-d" }}</td>
+                                                <td class="text-center fw-bolder td_amount">
                                                     {% if i.type == 'Cash Withdraw' %}
-                                                        <p class="p_red pred">- ₹{{ i.amount }}</p>
+                                                        <p class="p_red pred">-₹{{ i.amount }}</p>
                                                     {% elif  i.type == 'Adjustment Reduce'  %}
-                                                        <p class="p_red pred">- ₹{{ i.amount }}</p>
+                                                        <p class="p_red pred">-₹{{ i.amount }}</p>
                                                     {% elif  i.type == 'Adjustment Increase'  %}
-                                                        <p class="p_green pgreen">+ ₹{{ i.amount }}</p>
+                                                        <p class="p_green pgreen">+₹{{ i.amount }}</p>
                                                     {% elif i.from_here.id == bank.id %}
-                                                        <p class="p_red pred">- ₹{{ i.amount }}</p>
+                                                        <p class="p_red pred">-₹{{ i.amount }}</p>
                                                     {% else %}
-                                                        <p class="p_green pgreen">+ ₹{{ i.amount }}</p>
+                                                        <p class="p_green pgreen">+₹{{ i.amount }}</p>
                                                     {% endif %}
                                                 </td>
-                                                <td class="text-center fw-bolder">{{ i.last_action }}</td>
-                                                <td class="text-center fw-bolder tb">{{ i.by|capfirst }}</td>
+                                                <td class="text-center fw-bolder td_action">{{ i.last_action }}</td>
+                                                <td class="text-center fw-bolder tb td_by">{{ i.by|capfirst }}</td>
                                                 <td class="p-0 pt-1 m-0 hide_this_for_print">
                                                     <div class="btn-group mb-1">
                                                         <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -615,6 +792,7 @@
             $('.table').removeClass('table-striped')
             $('table th').css({'color':'black'})
             $('.remove_color').attr('color','black')
+            $('.custom-dropdown').attr('hidden',true)
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             document.body.appendChild(iframe);
@@ -651,6 +829,7 @@
             iframe.contentWindow.print();
             document.body.removeChild(iframe);
 
+            $('.custom-dropdown').attr('hidden',false)
             $('.hide_field').attr('hidden',false)
             $('.hide_this_for_print').attr('hidden',false)
             $('.over').css({'overflow':'visible'})
@@ -662,6 +841,184 @@
             $('table td').removeClass('text-dark')
             $('.hide_field').attr('hidden',true)
             window.location.href=''
+        }
+        // custom dropdown1
+        function toggleDropdown1() 
+        {
+            var dropdownContent = document.querySelector('.dd1');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick1() 
+        {
+            var inputValue = $('#dd1_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                if($(this).find('.td_type').text().toLocaleLowerCase()===inputValue)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown1();
+        }
+        function clear_input1()
+        {
+            $('#dd1_input').val('')
+        }
+        // custom dropdown2
+        function toggleDropdown2() 
+        {
+            var dropdownContent = document.querySelector('.dd2');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick2() 
+        {
+            var inputValue = $('#dd2_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                if($(this).find('.td_name').text().toLocaleLowerCase().indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    // alert($(this).find('.td_name').text().toLocaleLowerCase(),inputValue)
+                    $(this).hide()
+                }
+            })
+            toggleDropdown2();
+        }
+        function clear_input2()
+        {
+            $('#dd2_input').val('')
+        }
+        // custom dropdown3
+        function toggleDropdown3() 
+        {
+            var dropdownContent = document.querySelector('.dd3');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick3() 
+        {
+            var inputValue = $('#dd3_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                if($(this).find('.td_date').text().toLocaleLowerCase().indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown3();
+        }
+        function clear_input3()
+        {
+            $('#dd3_input').val('')
+        }
+        // custom dropdown4
+        function toggleDropdown4() 
+        {
+            var dropdownContent = document.querySelector('.dd4');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick4() 
+        {
+            var inputValue = $('#dd4_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                var a =  $(this).find('.td_amount').text().replace('₹','')
+                if(a.replace('','').indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown4();
+        }
+        function clear_input4()
+        {
+            $('#dd4_input').val('')
+        }
+        // custom dropdown5
+        function toggleDropdown5() 
+        {
+            var dropdownContent = document.querySelector('.dd5');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick5() 
+        {
+            var inputValue = $('#dd5_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                var a =  $(this).find('.td_balance').text().replace('₹','')
+                if(a.replace('','').indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown5();
+        }
+        function clear_input5()
+        {
+            $('#dd5_input').val('')
+        }
+        // custom dropdow6
+        function toggleDropdown6() 
+        {
+            var dropdownContent = document.querySelector('.dd6');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick6() 
+        {
+            var inputValue = $('#dd6_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                if($(this).find('.td_action').text().toLocaleLowerCase().indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown6();
+        }
+        function clear_input6()
+        {
+            $('#dd6_input').val('')
+        }
+        // custom dropdow7
+        function toggleDropdown7() 
+        {
+            var dropdownContent = document.querySelector('.dd7');
+            dropdownContent.style.display = dropdownContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleButtonClick7() 
+        {
+            var inputValue = $('#dd7_input').val().toLowerCase();
+            $('#myTable tbody tr').each(function(){
+                if($(this).find('.td_by').text().toLocaleLowerCase().indexOf(inputValue)>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+            toggleDropdown7();
+        }
+        function clear_input7()
+        {
+            $('#dd7_input').val('')
         }
 </script>
 
