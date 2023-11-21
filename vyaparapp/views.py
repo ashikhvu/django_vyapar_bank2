@@ -1959,7 +1959,7 @@ def update_bank_transaction(request,pk,bank_id):
     return redirect('banks_list',pk=0)
   return redirect('banks_list',pk=0)
 
-from openpyxl import load_workbook
+from openpyxl import load_workbook,Workbook
 from django.utils import timezone
 
 #@login_required(login_url='login')
@@ -2293,6 +2293,37 @@ def import_statement_from_excel(request,pk):
       messages.warning(request,"Table field is missing / you are importing the wrong File.")
     return redirect('bank_transaction_statement',bank_id=pk)
 
+
+def downloadEstimateSampleImportFile(request):
+    
+    challan_table_data = [['DATE','DUE DATE','NAME','STATE OF SUPPLY','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','GRAND TOTAL'], ['1', '2023-11-20', '2023-11-20', 'Alwin', 'State', 'Sample Description','1000','0','25','25','50','0','1050']]
+    items_table_data = [['CHALLAN NO', 'NAME','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL'], ['1', 'Test Item 1','788987','1','1000','5','0','1000']]
+
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'challan'
+    sheet2 = wb.create_sheet(title='items')
+
+    # Populate the sheets with data
+    for row in challan_table_data:
+        sheet1.append(row)
+
+    for row in items_table_data:
+        sheet2.append(row)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=challan_sample_file.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+def importEstimateFromExcel(request):
+  pass
+
 #@login_required(login_url='login')
 def transaction_history(request,pk,bank_id):
     
@@ -2304,14 +2335,15 @@ def transaction_history(request,pk,bank_id):
 
     all_banks = BankModel.objects.filter(company=get_company_id_using_user_id.id)
 
-    tr_history1 = BankTransactionHistory.objects.filter(action__contains='BANK CREATION',bank=bank_id)
+    # tr_history1 = BankTransactionHistory.objects.filter(action__contains='BANK CREATION',bank=bank_id)
     tr_history2 = BankTransactionHistory.objects.filter(Q(action__contains='BANK OPEN BALANCE CREATED') | Q(action__contains='BANK OPEN BALANCE UPDATED'),bank=bank_id)    
     tr_history = BankTransactionHistory.objects.filter(bank_trans=pk)
-    # print(tr_history,'\n',tr_history1)
     if pk != 0:
-      tr_historys = tr_history | tr_history1
+      # tr_historys = tr_history | tr_history1
+      tr_historys = tr_history
     else:
-      tr_historys = tr_history1 | tr_history1 | tr_history2
+      # tr_historys = tr_history1 | tr_history1 | tr_history2
+      tr_historys =  tr_history | tr_history2
     # print(tr_history)
     
     return render(request,'company/bank_transaction_history.html',{"allmodules":allmodules,

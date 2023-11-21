@@ -145,6 +145,8 @@ urlpatterns = [
     path('import_statement_from_excel/<int:pk>',views.import_statement_from_excel,name='import_statement_from_excel'),
     path('transaction_history/<int:pk>/<int:bank_id>',views.transaction_history,name='transaction_history'),
     path('bank_transaction_statement/<int:bank_id>',views.bank_transaction_statement,name='bank_transaction_statement'),
+    path('downloadEstimateSampleImportFile',views.downloadEstimateSampleImportFile,name='downloadEstimateSampleImportFile'),
+    path('importEstimateFromExcel',views.importEstimateFromExcel,name='importEstimateFromExcel'),
 
     #******************************************   ASHIKH V U (start) ****************************************************
     

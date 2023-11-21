@@ -214,20 +214,20 @@
                                     </div>
                                 </div>
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
-                                <button class="btn p-0 ps-2 pe-1 m-0" type="button" onclick="printContent()"><span><img draggable="false" width="22px" src="{% static 'assets/printer1.png' %}" alt="no img"></span></button>
+                                <button data-toggle="tooltip" data-placement="top" title="Print" class="btn p-0 ps-2 pe-1 m-0" type="button" onclick="printContent()"><span><img draggable="false" width="22px" src="{% static 'assets/printer1.png' %}" alt="no img"></span></button>
                                 <form id="myForm" action="{% url 'import_statement_from_excel' bank.id %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input id="file_" hidden type="file"  name="excel_file">
-                                    <label for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
+                                    <label data-toggle="tooltip" data-placement="top" title="Import from Excel" for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
                                     <input id="submit_import_excel" hidden type="submit">
                                 </form>
-                                <button class="btn p-0 ps-1 pe-1 m-0" type="button" onclick="exportToExcel()"><span><img draggable="false" width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
+                                <button data-toggle="tooltip" data-placement="top" title="Export to Excel" class="btn p-0 ps-1 pe-1 m-0" type="button" onclick="exportToExcel()"><span><img draggable="false" width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
                             </div>
                         </div>
                         <hr class="mt-3">
                         <br>
                         <div class="p-4" style="background-color: rgb(238, 245, 255);">
-                            <div style="border: 1px solid rgba(0, 0, 0, 0.408);background-color: rgb(97, 97, 97)92)17);" class="p-3 rounded">
+                            <div style="border: 1px solid rgba(0, 0, 0, 0.408);background-color: rgb(97, 97, 97,0);" class="p-3 rounded">
                                 <br>
                                 <h2 style="text-align:center;margin-top: 0.2rem;font-weight: 500;">TRANSACTION STATEMENT</h2>
                                 <h5 class="text-center mt-1" style="font-weight: 900;">{{ bank.bank_name|upper }} BANK</h3>
@@ -238,113 +238,22 @@
                                         <thead style="background-color: rgb(155, 208, 255);">
                                             <th hidden class="text-center fs-2 hide_field">#</th>
                                             <th style="font-weight: 900;" class="text-center fs-3">
-                                                TYPE 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown1()"></span>
-                                                    <div class="dropdown-content dd1">
-                                                        <span onclick="toggleDropdown1()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd1_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input1()">CLEAR</button>
-                                                        <button onclick="handleButtonClick1()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
+                                                TYPE
                                             </th>
-                                            <th style="font-weight: 900;" class="text-center fs-3 show_bank_id" hidden>FROM <span class="fa fa-filter ps-1 fs-1"></span></th>
-                                            <th style="font-weight: 900;" class="text-center fs-3 fs-2 show_bank_id" hidden>TO <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <th style="font-weight: 900;" class="text-center fs-3 show_bank_id hide_field" hidden>FROM <span class="fa fa-filter ps-1 fs-1"></span></th>
+                                            <th style="font-weight: 900;" class="text-center fs-3 fs-2 show_bank_id hide_field" hidden>TO <span class="fa fa-filter ps-1 fs-1"></span></th>
                                             <th style="font-weight: 900;" class="text-center fs-3">
-                                                NAME 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown2()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd2">
-                                                        <span onclick="toggleDropdown2()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd2_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input2()">CLEAR</button>
-                                                        <button onclick="handleButtonClick2()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
+                                                NAME
                                             </th>
                                             <th style="font-weight: 900;" class="text-center fs-3">
-                                                DATE 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown3()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd3">
-                                                        <span onclick="toggleDropdown3()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd3_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input3()">CLEAR</button>
-                                                        <button onclick="handleButtonClick3()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
+                                                DATE
                                             </th>
                                             <th style="font-weight: 900;" class="text-center fs-3">
                                                 AMOUNT
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown4()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd4">
-                                                        <span onclick="toggleDropdown4()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd4_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input4()">CLEAR</button>
-                                                        <button onclick="handleButtonClick4()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
                                             </th>
                                             <th style="font-weight: 900;" class="text-center fs-3">
-                                                BALANCE 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown5()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd5">
-                                                        <span onclick="toggleDropdown5()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd5_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input5()">CLEAR</button>
-                                                        <button onclick="handleButtonClick5()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
+                                                BALANCE
                                             </th>
-                                            <th hidden style="font-weight: 900;" class="text-center fs-3">
-                                                ACTION 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown6()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd6">
-                                                        <span onclick="toggleDropdown6()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd6_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input6()">CLEAR</button>
-                                                        <button onclick="handleButtonClick6()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
-                                            </th>
-                                            <th hidden style="font-weight: 900;" class="text-center fs-3">
-                                                BY 
-                                                <!-- <div class="custom-dropdown">
-                                                    <span class="fa fa-filter ps-1 fs-1" onclick="toggleDropdown7()"></span>
-                                                    <div style="display: none;" class="dropdown-content dd7">
-                                                        <span onclick="toggleDropdown7()" class="fa fa-times cls"></span>
-                                                        <h6 class="title mb-0 mb-2">EXACT MATCH</h6>
-                                                        <input id="dd7_input" type="text" placeholder="Enter something...">
-                                                        <div class="d-flex">
-                                                        <button class="me-2" onclick="clear_input7()">CLEAR</button>
-                                                        <button onclick="handleButtonClick7()">SUBMIT</button>
-                                                        </div>
-                                                    </div>
-                                                    </div> -->
-                                            </th>
-                                            <th hidden class="text-center p-0 m-0 hide_this_for_print"></th>
                                         </thead>
                                         <tbody>
                                             {% if bank.open_balance != 0 %}
@@ -355,26 +264,12 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-center td_type">Open. Balance</td>
-                                                <td class="text-center show_bank_id" hidden>{{ bank.id }}</td>
-                                                <td class="text-center show_bank_id" hidden></td>
+                                                <td class="text-center show_bank_id hide_field" hidden>{{ bank.id }}</td>
+                                                <td class="text-center show_bank_id hide_field" hidden></td>
                                                 <td class="text-center td_name">Opening Blance</td>
                                                 <td class="text-center date-column td_date">{{ bank.as_of_date|date:"Y-m-d" }}</td>
                                                 <td class="text-center fw-bolder td_amount">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
                                                 <td class="text-center fw-bolder td_balance">{% if bank.open_balance < 0 %}-₹{{ bank.open_balance|mul:-1 }}{% else %}₹{{ bank.open_balance }}{% endif %}</td>
-                                                <td hidden class="text-center fw-bolder td_action">{% if open_bal_last_edited.action == 'BANK OPEN BALANCE CREATED' %}CREATED{% else %}UPDATED{% endif %}</td>
-                                                <td hidden class="text-center fw-bolder td_by">{{ open_bal_last_edited.done_by_name|capfirst }}</td>
-                                                <td hidden class="p-0 pt-1 m-0 hide_this_for_print">
-                                                    <div class="btn-group mb-1">
-                                                        <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item fw-bold tb hide_table_text_v" href="{% url 'bank_view_or_edit' bank.id %}"><span class="fa fa-eye pe-2 tg"></span> View / Edit</a></li>
-                                                            <li><a class="dropdown-item fw-bold tb hide_table_text_d" onclick="bank_open_stk_delete({{ bank.id }})"><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</a></li>
-                                                            <li><a type="button" class="dropdown-item fw-bold tb hide_table_text_d" href="{% url 'transaction_history' 0 bank.id %}"><span class="fa fa-history tbl" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Transaction History</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
                                             </tr>
                                             {% endif %}
                                             {% for i in transactions %}
@@ -385,8 +280,8 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-center td_type">{{ i.type|lower|capfirst }}</td>
-                                                    <td class="text-center show_bank_id" hidden>{{ i.from_here.id }}</td>
-                                                    <td class="text-center show_bank_id" hidden>{{ i.to_here.id }}</td>
+                                                    <td class="text-center show_bank_id hide_field" hidden>{{ i.from_here.id }}</td>
+                                                    <td class="text-center show_bank_id hide_field" hidden>{{ i.to_here.id }}</td>
                                                     <td class="text-center td_name">
                                                         {% if i.type == 'Cash Deposit' or i.type == 'CASH DEPOSIT' %}
                                                             Cash Deposit
@@ -419,24 +314,6 @@
                                                         {% endif %}
                                                     </td>
                                                     <td class="text-center fw-bolder td_balance">{% if i.current_amount < 0 %}-₹{{ i.current_amount|mul:-1 }}{% else %}₹{{ i.current_amount }}{% endif %}</td>
-                                                    <td hidden class="text-center fw-bolder td_action">{{ i.last_action }}</td>
-                                                    <td hidden class="text-center fw-bolder tb td_by">{{ i.by|capfirst }}</td>
-                                                    <td hidden class="p-0 pt-1 m-0 hide_this_for_print">
-                                                        <div class="btn-group mb-1">
-                                                            <button style="border: none;background: none;" type="button" class="ropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <span class="fa fa-ellipsis-v text-dark fs-1 ps-"></span>
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><button type="button" data-bs-toggle="modal" data-bs-target="#myModal2" class="dropdown-item fw-bold tb hide_table_text_v" 
-                                                                hx-get="{% url 'view_or_edit_bank_transaction' i.id bank.id %}"
-                                                                hx-trigger="click delay:0s"
-                                                                hx-target="#bank_modal_view_or_edit"
-                                                                ><span class="fa fa-eye pe-2 tg"></span> View / Edit</button></li>
-                                                                <li><button type="button" onclick="delete_bank_transaction({{ i.id }},{{ bank.id }})" class="dropdown-item fw-bold tb hide_table_text_d" href=""><span class="fa fa-trash tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete</button></li>
-                                                                <li><a type="button" class="dropdown-item fw-bold tb hide_table_text_d" href="{% url 'transaction_history' i.id bank.id %}"><span class="fa fa-history tbl" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Transaction History</a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
@@ -527,14 +404,14 @@
     function exportToExcel() {
         $('.hide_table_text_v').text('')
         $('.hide_table_text_d').text('')
-        $('.show_bank_id').attr('hidden',false)
+        // $('.show_bank_id').attr('hidden',false)
         $('.hide_field').remove()
         const table = document.getElementById('myTable');
         const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
         XLSX.writeFile(wb, "bank_statement.xlsx");
         $('.hide_table_text_v').html('<span class="fa fa-eye pe-2 tg"></span> View / Edit')
         $('.hide_table_text_d').html('<span class="fa fa-trash-alt tr" style="padding-inline-start: 0.1rem;padding-inline-end:0.7rem ;"></span> Delete')
-        $('.show_bank_id').attr('hidden',true)
+        // $('.show_bank_id').attr('hidden',true)
         window.location.href=''
     }
     $(document).ready(function() {
@@ -995,6 +872,10 @@
         }
         $(document).ready(function(){
             $('#date_statement').text('( '+$('#startDate').val()+' - '+$('#endDate').val()+' )')
+        })
+        // bootstrap tooltip
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
         })
 </script>
 
