@@ -1405,7 +1405,7 @@ def bank_create_new(request):
     else:
       parmission_var2 = 0
     branch_name = request.POST['branch_name']
-    upi_id = request.POST.get('upi_id')
+    # upi_id = request.POST.get('upi_id')
     as_of_date = request.POST['as_of_date']
     card_type = request.POST.get('card_type')
     open_balance = request.POST['open_balance']
@@ -1424,7 +1424,7 @@ def bank_create_new(request):
                                 account_num=account_num,
                                 ifsc=ifsc,
                                 branch_name=branch_name,
-                                upi_id=upi_id,
+                                # upi_id=upi_id,
                                 as_of_date=as_of_date,
                                 card_type=card_type,
                                 open_balance=open_balance,
@@ -1500,7 +1500,7 @@ def bank_update(request,pk):
     else:
       parmission_var2 = 0
     branch_name = request.POST['branch_name']
-    upi_id = request.POST.get('upi_id')
+    # upi_id = request.POST.get('upi_id')
     as_of_date = request.POST['as_of_date']
     card_type = request.POST.get('card_type')
     open_balance = request.POST['open_balance']
@@ -1518,7 +1518,7 @@ def bank_update(request,pk):
           bank_data.account_num = account_num
           bank_data.ifsc = ifsc
           bank_data.branch_name = branch_name
-          bank_data.upi_id = upi_id
+          # bank_data.upi_id = upi_id
           bank_data.as_of_date = as_of_date
           bank_data.card_type = card_type
 
@@ -2296,8 +2296,8 @@ def import_statement_from_excel(request,pk):
 
 def downloadTransactionSampleImportFile(request):
     
-    bank_table = [['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','UPI ID','AS OF DATE','CARD TYPE','OPENING BALANCE'], ['AXIS', '68454687876', 'AXIS5645465', 'ernakulam', 'bilal@axis', '2023-11-20','DEBIT','50000'],['HDFC', '78454687005', 'HDFC5645465', 'ernakulam', 'rahul@axis', '2023-11-20','CREDIT','12500']]
-    items_table_data = [['TYPE','NAME','FROM','FROM ACCOUNT NUMBER','TO','TO ACCOUNT NUMBER','DATE','AMOUNT'], ['BANK TO BANK','FROM:HDFC','ICICI','654654654','AXIS','68454687876','2023-11-20','2500'],['BANK TO BANK','TO:HDFC','ICICI','654654654','AXIS','68454687876','2023-11-20','2500'],['CASH WITHDRAW','CASH WITHDRAW','ICICI','654654654','NILL','NILL','2023-11-20','2500'],['CASH DEPOSIT','CASH DEPOSIT','NILL','NILL','ICICI','654654654','2023-11-20','2500'],['ADJUSTMENT INCREASE','ADJUSTMENT INCREASE','ICICI','654654654','NILL','NILL','2023-11-20','2500'],['ADJUSTMENT REDUCE','ADJUSTMENT REDUCE','ICICI','654654654','NILL','NILL','2023-11-20','2500']]
+    bank_table = [['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','AS OF DATE','CARD TYPE','OPENING BALANCE'], ['AXIS', '68454687876', 'AXIS5645465', 'ernakulam', '2023-11-20','DEBIT','50000'],['HDFC', '78454687005', 'HDFC5645465', 'ernakulam', '2023-11-20','CREDIT','12500']]
+    items_table_data = [['TYPE','NAME','FROM','FROM ACCOUNT NUMBER','TO','TO ACCOUNT NUMBER','DATE','AMOUNT'], ['BANK TO BANK','FROM:HDFC','AXIS','68454687876','HDFC','78454687005','2023-11-20','2500'],['BANK TO BANK','TO:HDFC','HDFC','78454687005','AXIS','68454687876','2023-11-20','2500'],['CASH WITHDRAW','CASH WITHDRAW','AXIS','68454687876','NILL','NILL','2023-11-20','2500'],['CASH DEPOSIT','CASH DEPOSIT','NILL','NILL','HDFC','78454687005','2023-11-20','2500'],['ADJUSTMENT INCREASE','ADJUSTMENT INCREASE','AXIS','68454687876','NILL','NILL','2023-11-20','2500'],['ADJUSTMENT REDUCE','ADJUSTMENT REDUCE','HDFC','78454687005','NILL','NILL','2023-11-20','2500']]
 
     wb = Workbook()
 
@@ -2330,7 +2330,8 @@ def importTransactionFromExcel(request):
       return redirect('/')
     staff_id = request.session['staff_id']
     staff =  staff_details.objects.get(id=staff_id)
-    get_company_id_using_user_id = company.objects.get(id=staff.company.id)  
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    user = get_company_id_using_user_id.user
     
     current_datetime = timezone.now()
     dateToday =  current_datetime.date()
@@ -2346,33 +2347,32 @@ def importTransactionFromExcel(request):
           ws = wb["Banks"]
         except:
           print('sheet not found')
-          messages.error(request,'`Banks` sheet not found.! Please check.')
-          return redirect('banks_list',pk=0)
-
+          messages.warning(request,'`Banks` sheet not found.! Please check.')
+          return redirect(request.META.get('HTTP_REFERER'))
         try:
           ws = wb["Transactions"]
         except:
           print('sheet not found')
-          messages.error(request,'`Transaction` sheet not found.! Please check.')
-          return redirect('banks_list',pk=0)
+          messages.warning(request,'`Transaction` sheet not found.! Please check.')
+          return redirect(request.META.get('HTTP_REFERER'))
         
         ws1 = wb["Banks"]
-        banks_columns = ['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','UPI ID','AS OF DATE','CARD TYPE','OPENING BALANCE']
+        banks_columns = ['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','AS OF DATE','CARD TYPE','OPENING BALANCE']
         banks_sheet = [cell.value for cell in ws1[1]]
         if banks_sheet != banks_columns:
           print('invalid sheet')
-          messages.error(request,'`Banks` sheet column names or order is not in the required formate.! Please check.')
-          return redirect('banks_list',pk=0)
+          messages.warning(request,'`Banks` sheet column names or order is not in the required formate.! Please check.')
+          return redirect(request.META.get('HTTP_REFERER'))
 
         for row in ws1.iter_rows(min_row=2, values_only=True):
-          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
           if BANK_NAME is ACCOUNT_NUMBER or IFSC_CODE is BRANCH_NAME or AS_OF_DATE is None or CARD_TYPE is None:
             messages.warning(request,'`BANKS` sheet entries missing required fields.! Please check.')
-            return redirect('banks_list',pk=0)
+            return redirect(request.META.get('HTTP_REFERER'))
           print(CARD_TYPE.upper() )
           if CARD_TYPE.upper() != 'CREDIT' and CARD_TYPE.upper() != 'DEBIT' :
             messages.warning(request,'`TYPE` values should either "CREDIT" or "DEBIT".')
-            return redirect('banks_list',pk=0)
+            return redirect(request.META.get('HTTP_REFERER'))
         
         # checking items sheet columns
         ws2 = wb["Transactions"]
@@ -2380,8 +2380,8 @@ def importTransactionFromExcel(request):
         transaction_sheet = [cell.value for cell in ws2[1]]
         if transaction_sheet != transaction_columns:
           print('invalid sheet')
-          messages.error(request,'`Transactions` sheet column names or order is not in the required formate.! Please check.')
-          return redirect('banks_list',pk=0)
+          messages.warning(request,'`Transactions` sheet column names or order is not in the required formate.! Please check.')
+          return redirect(request.META.get('HTTP_REFERER'))
 
         # check the type field is valid or not it
         ws2 = wb['Transactions']
@@ -2393,18 +2393,18 @@ def importTransactionFromExcel(request):
             print(TYPE)
             if TYPE != 'BANK TO BANK' and TYPE != ''  and TYPE != 'CASH WITHDRAW'  and TYPE != 'CASH DEPOSIT'  and TYPE != 'ADJUSTMENT INCREASE'  and TYPE != 'ADJUSTMENT REDUCE':
               messages.warning(request,'Field Error "TYPE" value should be "BANK TO BANK" / "CASH WITHDRAW" / "CASH DEPOSIT" / "ADJUSTMENT INCREASE" / "ADJUSTMENT REDUCE"')
-              return redirect('banks_list',pk=0)
+              return redirect(request.META.get('HTTP_REFERER'))
         
         # getting data from estimate sheet and create estimate.
         ws1 = wb['Banks']
         for row in ws1.iter_rows(min_row=2, values_only=True):
-          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
           
           print(BANK_NAME)
           banks = BankModel.objects.filter(company = get_company_id_using_user_id)
-          
           user = get_company_id_using_user_id.user
-          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
           bank_name = BANK_NAME
           account_num = ACCOUNT_NUMBER
           if BankModel.objects.exclude(company=get_company_id_using_user_id.id).filter(bank_name=BANK_NAME,account_num=ACCOUNT_NUMBER).exists():
@@ -2415,13 +2415,12 @@ def importTransactionFromExcel(request):
             parmission_var1 = 1
           else:
             parmission_var1 = 0
-          ifsc = IFSC_CODE
+          ifsc = str(IFSC_CODE)
           if validate_ifsc(ifsc):
             parmission_var2 = 1
           else:
             parmission_var2 = 0
           branch_name = BRANCH_NAME
-          upi_id = UPI_ID
           as_of_date = AS_OF_DATE
           card_type = CARD_TYPE
           open_balance = OPENING_BALANCE
@@ -2434,7 +2433,7 @@ def importTransactionFromExcel(request):
 
           if banks.filter(bank_name=BANK_NAME,account_num=ACCOUNT_NUMBER).exists():
             messages.info(request,f'"{BANK_NAME}" Bank with Account number "{ACCOUNT_NUMBER}" already excist.')
-            return redirect('banks_list',pk=0)
+            return redirect(request.META.get('HTTP_REFERER'))
           else:
             if parmission_var == 1:
               if parmission_var1 == 1:
@@ -2445,7 +2444,7 @@ def importTransactionFromExcel(request):
                                         account_num=account_num,
                                         ifsc=ifsc,
                                         branch_name=branch_name,
-                                        upi_id=upi_id,
+                                        # upi_id=upi_id,
                                         as_of_date=as_of_date,
                                         card_type=card_type,
                                         open_balance=open_balance,
@@ -2465,14 +2464,14 @@ def importTransactionFromExcel(request):
                                                       done_by=staff)
                   tr_history.save()
                 else:
-                  messages.error(request,'IFSC CODE is not valid')
-                  return redirect('bank_create')
+                  messages.warning(request,'IFSC CODE is not valid')
+                  return redirect(request.META.get('HTTP_REFERER'))
               else:
-                messages.error(request,'Account number is not valid')
-                return redirect('bank_create')
+                messages.warning(request,'Account number is not valid')
+                return redirect(request.META.get('HTTP_REFERER'))
             else:
-              messages.error(request,'Account number already exist')
-              return redirect('bank_create')
+              messages.warning(request,'Account number already exist')
+              return redirect(request.META.get('HTTP_REFERER'))
 
         bank_excist_valid = True
         ws2 = wb['Transactions']
@@ -2483,10 +2482,10 @@ def importTransactionFromExcel(request):
             TYPE = TYPE.upper()
           
           if AMOUNT != None:
-            AMOUNT = AMOUNT.replace(' ','')
-            AMOUNT = AMOUNT.replace('₹','')
-            AMOUNT = AMOUNT.replace('-','')
-            AMOUNT = AMOUNT.replace('+','')
+            # AMOUNT = AMOUNT.replace(' ','')
+            # AMOUNT = AMOUNT.replace('₹','')
+            # AMOUNT = AMOUNT.replace('-','')
+            # AMOUNT = AMOUNT.replace('+','')
             AMOUNT = int(float(AMOUNT))
 
           if TYPE == "BANK TO BANK" or TYPE == 'Bank to bank':
@@ -2638,7 +2637,7 @@ def importTransactionFromExcel(request):
           messages.info(request,"Few Bank Transactions can't be imported because the bank in the imported file doesn't excist")
         else:
           messages.success(request, 'Data imported successfully.!')
-    return redirect('banks_list',pk=0)
+    return redirect(request.META.get('HTTP_REFERER'))
 
 #@login_required(login_url='login')
 def transaction_history(request,pk,bank_id):

@@ -179,11 +179,11 @@
                           <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="BRANCH NAME" value="{{ bank.branch_name|upper }}" autocomplete="off" name="branch_name" required>
                           <hr>
                         </div>
-                        <div class="w-100 field_margin">
+                        <!-- <div class="w-100 field_margin">
                           <label for="">UPI ID</label>
                           <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="user@bankname"value="{{ bank.upi_id|lower }}" name="upi_id" >                        
                           <hr>
-                        </div>
+                        </div> -->
                         <div class="w-100 field_margin">
                           <label for="">AS OF DATE</label>
                           <input id="date_" style="color: black;" class="form-control border-dark fw-bolder" type="date" placeholder="IFSC CODE"value="{{ bank.as_of_date|date:'Y-m-d' }}" name="as_of_date" required>
