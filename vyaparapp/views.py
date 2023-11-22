@@ -2294,19 +2294,19 @@ def import_statement_from_excel(request,pk):
     return redirect('bank_transaction_statement',bank_id=pk)
 
 
-def downloadEstimateSampleImportFile(request):
+def downloadTransactionSampleImportFile(request):
     
-    challan_table_data = [['DATE','DUE DATE','NAME','STATE OF SUPPLY','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','GRAND TOTAL'], ['1', '2023-11-20', '2023-11-20', 'Alwin', 'State', 'Sample Description','1000','0','25','25','50','0','1050']]
-    items_table_data = [['CHALLAN NO', 'NAME','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL'], ['1', 'Test Item 1','788987','1','1000','5','0','1000']]
+    bank_table = [['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','UPI ID','AS OF DATE','CARD TYPE','OPENING BALANCE'], ['AXIS', '68454687876', 'AXIS5645465', 'ernakulam', 'bilal@axis', '2023-11-20','DEBIT','50000'],['HDFC', '78454687005', 'HDFC5645465', 'ernakulam', 'rahul@axis', '2023-11-20','CREDIT','12500']]
+    items_table_data = [['TYPE','NAME','FROM','FROM ACCOUNT NUMBER','TO','TO ACCOUNT NUMBER','DATE','AMOUNT'], ['BANK TO BANK','FROM:HDFC','ICICI','654654654','AXIS','68454687876','2023-11-20','2500'],['BANK TO BANK','TO:HDFC','ICICI','654654654','AXIS','68454687876','2023-11-20','2500'],['CASH WITHDRAW','CASH WITHDRAW','ICICI','654654654','NILL','NILL','2023-11-20','2500'],['CASH DEPOSIT','CASH DEPOSIT','NILL','NILL','ICICI','654654654','2023-11-20','2500'],['ADJUSTMENT INCREASE','ADJUSTMENT INCREASE','ICICI','654654654','NILL','NILL','2023-11-20','2500'],['ADJUSTMENT REDUCE','ADJUSTMENT REDUCE','ICICI','654654654','NILL','NILL','2023-11-20','2500']]
 
     wb = Workbook()
 
     sheet1 = wb.active
-    sheet1.title = 'challan'
-    sheet2 = wb.create_sheet(title='items')
+    sheet1.title = 'Banks'
+    sheet2 = wb.create_sheet(title='Transactions')
 
     # Populate the sheets with data
-    for row in challan_table_data:
+    for row in bank_table:
         sheet1.append(row)
 
     for row in items_table_data:
@@ -2314,15 +2314,331 @@ def downloadEstimateSampleImportFile(request):
 
     # Create a response with the Excel file
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=challan_sample_file.xlsx'
+    response['Content-Disposition'] = 'attachment; filename=bank_transactions.xlsx'
 
     # Save the workbook to the response
     wb.save(response)
 
     return response
 
-def importEstimateFromExcel(request):
-  pass
+def importTransactionFromExcel(request):
+  if 'staff_id' in request.session:
+    if request.session.has_key('staff_id'):
+      staff_id = request.session['staff_id']
+            
+    else:
+      return redirect('/')
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)  
+    
+    current_datetime = timezone.now()
+    dateToday =  current_datetime.date()
+
+    if request.method == "POST" and 'excel_file' in request.FILES:
+    
+        excel_file = request.FILES['excel_file']
+
+        wb = load_workbook(excel_file)
+
+        # checking estimate sheet columns
+        try:
+          ws = wb["Banks"]
+        except:
+          print('sheet not found')
+          messages.error(request,'`Banks` sheet not found.! Please check.')
+          return redirect('banks_list',pk=0)
+
+        try:
+          ws = wb["Transactions"]
+        except:
+          print('sheet not found')
+          messages.error(request,'`Transaction` sheet not found.! Please check.')
+          return redirect('banks_list',pk=0)
+        
+        ws1 = wb["Banks"]
+        banks_columns = ['BANK NAME','ACCOUNT NUMBER','IFSC CODE','BRANCH NAME','UPI ID','AS OF DATE','CARD TYPE','OPENING BALANCE']
+        banks_sheet = [cell.value for cell in ws1[1]]
+        if banks_sheet != banks_columns:
+          print('invalid sheet')
+          messages.error(request,'`Banks` sheet column names or order is not in the required formate.! Please check.')
+          return redirect('banks_list',pk=0)
+
+        for row in ws1.iter_rows(min_row=2, values_only=True):
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+          if BANK_NAME is ACCOUNT_NUMBER or IFSC_CODE is BRANCH_NAME or AS_OF_DATE is None or CARD_TYPE is None:
+            messages.warning(request,'`BANKS` sheet entries missing required fields.! Please check.')
+            return redirect('banks_list',pk=0)
+          print(CARD_TYPE.upper() )
+          if CARD_TYPE.upper() != 'CREDIT' and CARD_TYPE.upper() != 'DEBIT' :
+            messages.warning(request,'`TYPE` values should either "CREDIT" or "DEBIT".')
+            return redirect('banks_list',pk=0)
+        
+        # checking items sheet columns
+        ws2 = wb["Transactions"]
+        transaction_columns = ['TYPE','NAME','FROM','FROM ACCOUNT NUMBER','TO','TO ACCOUNT NUMBER','DATE','AMOUNT']
+        transaction_sheet = [cell.value for cell in ws2[1]]
+        if transaction_sheet != transaction_columns:
+          print('invalid sheet')
+          messages.error(request,'`Transactions` sheet column names or order is not in the required formate.! Please check.')
+          return redirect('banks_list',pk=0)
+
+        # check the type field is valid or not it
+        ws2 = wb['Transactions']
+        for row in ws.iter_rows(min_row=2, values_only=True):
+          TYPE, NAME, FROM,FROM_ACCOUNT_NUMBER,TO,TO_ACCOUNT_NUMBER,DATE,AMOUNT = row
+
+          if TYPE != None:
+            TYPE = TYPE.upper()
+            print(TYPE)
+            if TYPE != 'BANK TO BANK' and TYPE != ''  and TYPE != 'CASH WITHDRAW'  and TYPE != 'CASH DEPOSIT'  and TYPE != 'ADJUSTMENT INCREASE'  and TYPE != 'ADJUSTMENT REDUCE':
+              messages.warning(request,'Field Error "TYPE" value should be "BANK TO BANK" / "CASH WITHDRAW" / "CASH DEPOSIT" / "ADJUSTMENT INCREASE" / "ADJUSTMENT REDUCE"')
+              return redirect('banks_list',pk=0)
+        
+        # getting data from estimate sheet and create estimate.
+        ws1 = wb['Banks']
+        for row in ws1.iter_rows(min_row=2, values_only=True):
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+          
+          print(BANK_NAME)
+          banks = BankModel.objects.filter(company = get_company_id_using_user_id)
+          
+          user = get_company_id_using_user_id.user
+          BANK_NAME,ACCOUNT_NUMBER,IFSC_CODE,BRANCH_NAME,UPI_ID,AS_OF_DATE,CARD_TYPE,OPENING_BALANCE = row
+          bank_name = BANK_NAME
+          account_num = ACCOUNT_NUMBER
+          if BankModel.objects.exclude(company=get_company_id_using_user_id.id).filter(bank_name=BANK_NAME,account_num=ACCOUNT_NUMBER).exists():
+            parmission_var = 0
+          else:
+            parmission_var = 1
+          if validate_bank_account_number(str(ACCOUNT_NUMBER)):
+            parmission_var1 = 1
+          else:
+            parmission_var1 = 0
+          ifsc = IFSC_CODE
+          if validate_ifsc(ifsc):
+            parmission_var2 = 1
+          else:
+            parmission_var2 = 0
+          branch_name = BRANCH_NAME
+          upi_id = UPI_ID
+          as_of_date = AS_OF_DATE
+          card_type = CARD_TYPE
+          open_balance = OPENING_BALANCE
+          
+          if open_balance == '' or open_balance == None:
+            open_balance = 0
+          if card_type == "CREDIT":
+            open_balance = int(open_balance)*-1
+          
+
+          if banks.filter(bank_name=BANK_NAME,account_num=ACCOUNT_NUMBER).exists():
+            messages.info(request,f'"{BANK_NAME}" Bank with Account number "{ACCOUNT_NUMBER}" already excist.')
+            return redirect('banks_list',pk=0)
+          else:
+            if parmission_var == 1:
+              if parmission_var1 == 1:
+                if parmission_var2 == 1:
+                  bank_data = BankModel(user=user,
+                                        company=get_company_id_using_user_id,
+                                        bank_name=bank_name,
+                                        account_num=account_num,
+                                        ifsc=ifsc,
+                                        branch_name=branch_name,
+                                        upi_id=upi_id,
+                                        as_of_date=as_of_date,
+                                        card_type=card_type,
+                                        open_balance=open_balance,
+                                        current_balance=open_balance,
+                                        created_by=user.first_name)
+                  bank_data.save()
+                  tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                                      bank=bank_data,
+                                                      action="BANK CREATION : "+bank_data.bank_name.upper(),
+                                                      done_by_name=staff.first_name,
+                                                      done_by=staff)
+                  tr_history.save()
+                  tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                                      bank=bank_data,
+                                                      action="BANK OPEN BALANCE CREATED",
+                                                      done_by_name=staff.first_name,
+                                                      done_by=staff)
+                  tr_history.save()
+                else:
+                  messages.error(request,'IFSC CODE is not valid')
+                  return redirect('bank_create')
+              else:
+                messages.error(request,'Account number is not valid')
+                return redirect('bank_create')
+            else:
+              messages.error(request,'Account number already exist')
+              return redirect('bank_create')
+
+        bank_excist_valid = True
+        ws2 = wb['Transactions']
+        for row in ws.iter_rows(min_row=2, values_only=True):
+          TYPE, NAME, FROM,FROM_ACCOUNT_NUMBER,TO,TO_ACCOUNT_NUMBER,DATE,AMOUNT = row
+
+          if TYPE != None:
+            TYPE = TYPE.upper()
+          
+          if AMOUNT != None:
+            AMOUNT = AMOUNT.replace(' ','')
+            AMOUNT = AMOUNT.replace('₹','')
+            AMOUNT = AMOUNT.replace('-','')
+            AMOUNT = AMOUNT.replace('+','')
+            AMOUNT = int(float(AMOUNT))
+
+          if TYPE == "BANK TO BANK" or TYPE == 'Bank to bank':
+            if BankModel.objects.filter(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER).exists() and BankModel.objects.filter(bank_name=TO,account_num=TO_ACCOUNT_NUMBER).exists():
+              from_here = BankModel.objects.get(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER)
+              to_here = BankModel.objects.get(bank_name=TO,account_num=TO_ACCOUNT_NUMBER)
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  to_here=to_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  last_action='CREATED',
+                                  by = staff.first_name,
+                                  )
+              transaction.save()
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+              to_here.current_balance += AMOUNT
+              to_here.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                                  bank=from_here,
+                                                  bank_trans=transaction,
+                                                  action="BANK TO BANK TRANSACTION CREATED",
+                                                  done_by_name=staff.first_name,
+                                                  done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid =False
+            
+          elif TYPE == 'Open. Balance' or TYPE == 'OPEN. BALANCE':
+            if BankModel.objects.filter(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER).exists():
+              from_here = BankModel.objects.get(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER)
+              if from_here.open_balance > AMOUNT:
+                from_here.current_balance += from_here.open_balance - AMOUNT
+              else:
+                from_here.current_balance -= from_here.open_balance - AMOUNT
+              from_here.open_balance = AMOUNT
+              from_here.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                                  bank=from_here,
+                                                  action="BANK OPEN BALANCE CREATED",
+                                                  done_by_name=staff.first_name,
+                                                  done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid = False
+          elif TYPE == 'Cash Withdraw' or TYPE == 'Cash withdraw' or TYPE == 'CASH WITHDRAW':
+            if BankModel.objects.filter(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER).exists():
+              from_here = BankModel.objects.get(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER)
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  last_action='CREATED',
+                                  by = staff.first_name,
+                                  )
+              transaction.save()
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=from_here,
+                                        bank_trans=transaction,
+                                        action="BANK TO CASH TRANSACTION CREATED",
+                                        date=date,
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid = False
+          elif TYPE == 'Cash Deposit' or TYPE == 'Cash deposit' or TYPE == 'CASH DEPOSIT':
+            if BankModel.objects.filter(bank_name=TO,account_num=TO_ACCOUNT_NUMBER).exists():
+              to_here = BankModel.objects.get(bank_name=TO,account_num=TO_ACCOUNT_NUMBER)
+              to_here.current_balance += AMOUNT
+              to_here.save()
+
+              transaction = BankTransactionModel(user = user,
+                                                  company=get_company_id_using_user_id,
+                                                  to_here=to_here,
+                                                  type=TYPE,
+                                                  amount=AMOUNT,
+                                                  date=DATE,
+                                                  last_action='CREATED',
+                                                  by = staff.first_name,
+                                                  )
+              transaction.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=to_here,
+                                        bank_trans=transaction,
+                                        action="CASH TO BANK TRANSACTION CREATED",
+                                        date=date,
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid = False
+          elif TYPE == 'Adjustment Increase' or TYPE == 'Adjustment increase' or TYPE == 'ADJUSTMENT INCREASE':
+            if BankModel.objects.filter(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER).exists():
+              from_here = BankModel.objects.get(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER)
+              from_here.current_balance += AMOUNT
+              from_here.save()
+              transaction =BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  last_action='CREATED',
+                                  by = staff.first_name,
+                                  )
+              transaction.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=from_here,
+                                        bank_trans=transaction,
+                                        action="BANK BALANCE ADJUSTMENT REDUCE CREATED",
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid = False
+          elif TYPE == 'Adjustment Reduce' or TYPE == 'Adjustment reduce' or TYPE == 'ADJUSTMENT REDUCE':
+            if BankModel.objects.filter(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER).exists():
+              from_here = BankModel.objects.get(bank_name=FROM,account_num=FROM_ACCOUNT_NUMBER)
+              from_here.current_balance -= AMOUNT
+              from_here.save()
+              transaction = BankTransactionModel(user = user,
+                                  company=get_company_id_using_user_id,
+                                  from_here=from_here,
+                                  type=TYPE,
+                                  amount=AMOUNT,
+                                  date=DATE,
+                                  last_action='CREATED',
+                                  by = staff.first_name,
+                                  )
+              transaction.save()
+              tr_history = BankTransactionHistory(company=get_company_id_using_user_id,
+                                        bank=from_here,
+                                        bank_trans=transaction,
+                                        action="BANK BALANCE ADJUSTMENT REDUCE CREATED",
+                                        done_by_name=staff.first_name,
+                                        done_by=staff)
+              tr_history.save()
+            else:
+              bank_excist_valid = False
+        if bank_excist_valid == False:
+          messages.info(request,"Few Bank Transactions can't be imported because the bank in the imported file doesn't excist")
+        else:
+          messages.success(request, 'Data imported successfully.!')
+    return redirect('banks_list',pk=0)
 
 #@login_required(login_url='login')
 def transaction_history(request,pk,bank_id):

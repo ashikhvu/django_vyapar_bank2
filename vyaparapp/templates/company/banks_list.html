@@ -353,13 +353,14 @@
                                 <input id="search_input1" style="padding-inline-start: 2rem;" class="w-100 border-secondary text-dark pt-1 pb-1 pe-1 rounded" type="text" placeholder=" search here..">
                                 <button data-toggle="tooltip" data-placement="top" title="Print" class="btn p-0 ps-2 pe-1 m-0" type="button" onclick="printContent()"><span><img draggable="false" width="22px" src="{% static 'assets/printer1.png' %}" alt="no img"></span></button>
                                 <a data-toggle="tooltip" data-placement="top" title="Transaction statements" class="btn p-0 ps-1 pe-1 m-0 mt-1" type="button" href="{% url 'bank_transaction_statement' bank.id %}"><span><img draggable="false" width="22px" src="{% static 'assets/statement1.png' %}" alt="no img"></span></a>
-                                <form id="myForm" action="{% url 'import_from_excel' bank.id %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
+                                <!-- <form id="myForm" action="{% url 'import_from_excel' bank.id %}" method="POST" class="p-0 m-0 " enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <input id="file_" hidden type="file"  name="excel_file">
                                     <label data-toggle="tooltip" data-placement="top" title="Import from Excel" for="file_" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
                                     <input id="submit_import_excel" hidden type="submit">
-                                </form>
-                                <button data-bs-toggle="modal" data-bs-target="#importTransactions">Here</button>
+                                </form> -->
+                                <label data-bs-toggle="modal" data-bs-target="#importTransactions" data-toggle="tooltip" data-placement="top" title="Import from Excel" class="btn p-1 ps-1 pe-1 m-0" type="button"><span><img draggable="false" width="23px" src="{% static 'assets/excel02.png' %}" alt="no img"></span></label>
+                                <!-- <button data-bs-toggle="modal" data-bs-target="#importTransactions">Here</button> -->
                                 <button data-toggle="tooltip" data-placement="top" title="Export to Excel" class="btn p-0 ps-1 pe-1 m-0" type="button" onclick="exportToExcel()"><span><img draggable="false" width="22px" src="{% static 'assets/excel2.png' %}" alt="no img"></span></button>
                             </div>
                         </div>
@@ -604,20 +605,86 @@
                     <h3 class="m-3">IMPORT TRANSACTIONS</h3>
                     <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
                 </div>
-                <div class="file_instructions">
+                <div class="file_instructions" style="cursor: all-scroll;">
                     <div class="alert alert-danger" role="alert">
-                        <span class="fw-bolder">IMPORTANT:</span>
-                        <p>File should have 2 sheets named 'Bank' & 'Transactions' and column name & order should be in the given formate(Uppercase).</p>
-                        <p class="fw-bolder">Bank sheet - BANK NAME*, ACCOUNT NUMBER*, IFSC CODE*, BRANCH NAME*, UPI ID, AS OF DATE*, CARD TYPE* <span class="fw-normal" style="color: green;">( Values must be either 'DEBIT' or 'CREDIT' in caps )</span> , OPENING BALANCE. </p>
-                        <p class="fw-bolder">Transaction sheet - TYPE*, FROM/TO* <span class="fw-normal" style="color: green;" >( Mension the name of the bank where the transaction was made, in caps EXAMPLE : - 'AXIS','HDFC' )</span>, ACCOUNT NUMBER*<span class="fw-normal" style="color: green;" >( Account Number of the bank that has mensioned in <span style="color: red">"FROM/TO"</span> field )</span>, DATE*, AMOUNT*.</p>
-                        <p>* All required columns should be filled.</p>
-                        <p>Date format should be 'YYYY-MM-DD' or 'DD-MM-YYYY'.</p>
+                        <div style="overflow-y: auto;height: 20rem;">
+                            <span class="fw-bolder">IMPORTANT:</span>
+                            <p>File should have 2 sheets named 'Bank' & 'Transactions' and column name & order should be in the given formate(Uppercase).</p>
+                            <p class="fw-bolder">Bank sheet - BANK NAME*, ACCOUNT NUMBER*, IFSC CODE*, BRANCH NAME*, UPI ID, AS OF DATE*, CARD TYPE*, OPENING BALANCE. </p>
+                            <p class="fw-bolder">Transaction sheet - TYPE*,NAME*, FROM*,FROM ACCOUNT NUMBER*,TO*,TO ACCOUN NUMBER*, ACCOUNT NUMBER*, DATE*, AMOUNT*.</p>
+                            <p>* All required columns should be filled.</p>
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">FROM*,TO* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;" > Mension the name of the banks where the transaction was made, in caps <span style="color: red;">( EXAMPLE : - 'AXIS','HDFC' )</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">FROM ACCOUNT NO*</p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;" > Account Number of the bank that has mensioned in <span style="color: red">( "FROM" )</span> fields .</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">TO ACCOUNT NO* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;" > Account Number of the bank that has mensioned in <span style="color: red">( "TO" )</span> fields .</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">CARD TYPE* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;"> Values must be either <span style="color: red;">( 'DEBIT' or 'CREDIT' )</span> in caps .</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">TYPE* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;"> Values must be <span style="color: red;">( 'BANK TO BANK' , 'CASH WITHDRAW' , 'CASH DEPOSIT' , 'ADJUSTMENT INCREASE' , 'ADJUSTMENT REDUCE' )</span> in caps .</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">NAME* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="fw- ps-2" style="color: green;"> Values must be <span style="color: red;">"FROM:BANK NAME" <span style="color: green;">or</span> "TO:BANK NAME"</span> only when the <span style="color: red;">"TYPE"</span> becomes <span style="color: red;">"BANK TO BANK"</span> otherwise Values of <span style="color: red;">"NAME"</span> field be as same as the values in <span style="color: red;">"TYPE"</span> ( in 'BANK NAME' you should mension the name of the bank )  .</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <p class="fw-bolder">DATE* </p>
+                                    </div>
+                                    <div class="col-1"><span style="font-weight: 900;">:</span></div>
+                                    <div class="col-sm-12 col-lg-9">
+                                        <p class="ps-2" style="color: green;">Format should be</span> <span style="color: green;">( 'YYYY-MM-DD' or 'DD-MM-YYYY' )</span>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="sample_file mb-2">
-                    <a href="{% url 'downloadEstimateSampleImportFile' %}" class="fw-bolder">Download Sample File</a>
+                    <a href="{% url 'downloadTransactionSampleImportFile' %}" class="fw-bolder">Download Sample File</a>
                 </div>
-                <form id="importEstimateForm" action="{% url 'importEstimateFromExcel' %}" method="POST" class="form" enctype="multipart/form-data">
+                <form id="importEstimateForm" action="{% url 'importTransactionFromExcel' %}" method="POST" class="form" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="excel_file" class="form-label">File</label>
