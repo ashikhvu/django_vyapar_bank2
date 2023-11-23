@@ -1223,8 +1223,13 @@ def account_num_check(request):
     bank_name = request.POST.get('bank_name')
     account_num = request.POST['account_num']
     account_num_valid = validate_bank_account_number(account_num)
+    staff_id = request.session['staff_id']
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     if account_num_valid:
-      if BankModel.objects.filter(bank_name=bank_name,user=request.user.id,account_num=account_num).exists():
+      if BankModel.objects.filter(bank_name=bank_name,company=get_company_id_using_user_id.id,account_num=account_num).exists():
         return HttpResponse('<small><span class="tr fs-2">Account Number already excist</span></small>')
       else:
         return HttpResponse('')
@@ -1238,8 +1243,14 @@ def account_num_check_for_edit(request,pk):
     bank_name = request.POST.get('bank_name')
     account_num = request.POST['account_num']
     account_num_valid = validate_bank_account_number(account_num)
+    staff_id = request.session['staff_id']
+    print(staff_id)
+    staff =  staff_details.objects.get(id=staff_id)
+    get_company_id_using_user_id = company.objects.get(id=staff.company.id)
+    # permission
+    allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     if account_num_valid:
-      if BankModel.objects.exclude(id=pk).filter(bank_name=bank_name,user=request.user.id,account_num=account_num).exists():
+      if BankModel.objects.exclude(id=pk).filter(bank_name=bank_name,company=get_company_id_using_user_id.id,account_num=account_num).exists():
         return HttpResponse('<small><span class="tr fs-2">Account Number already excist</span></small>')
       else:
         return HttpResponse('')
@@ -1277,7 +1288,14 @@ def bank_create(request):
     # permission
     allmodules= modules_list.objects.get(company=get_company_id_using_user_id,status='New')
     # permission
-    return render(request,'company/bank_create.html',{"allmodules":allmodules})
+    return render(request,'company/bank_create.html',{"allmodules":allmodules,
+                                                      'bank_name1':'',
+                                                      'account_num1':'',
+                                                      'ifsc_code1':'',
+                                                      'branch_name1':'',
+                                                      'as_of_date1':'',
+                                                      'card_type1':'',
+                                                      'ope_bal1':''})
 
 
 #@login_required(login_url='login')
@@ -1395,10 +1413,20 @@ def bank_create_new(request):
       parmission_var = 0
     else:
       parmission_var = 1
-    if validate_bank_account_number(account_num):
-      parmission_var1 = 1
+      
+    account_num_valid = validate_bank_account_number(account_num)
+    if account_num_valid:
+      if BankModel.objects.filter(bank_name=bank_name,company=get_company_id_using_user_id.id,account_num=account_num).exists():
+        parmission_var1 = 0
+        messages.warning(request,'Bank with this account number already exist')
+        return redirect('bank_create')
+      else:
+        parmission_var1 = 1
     else:
       parmission_var1 = 0
+
+
+
     ifsc = request.POST.get('ifsc')
     if validate_ifsc(ifsc):
       parmission_var2 = 1
@@ -1445,18 +1473,39 @@ def bank_create_new(request):
           tr_history.save()
           if request.POST.get('save_and_next'):
             messages.success(request,'Bank created successfully')
-            return redirect('bank_create')
+            return render(request,'company/bank_create.html',{"allmodules":allmodules})
           else:
             return redirect('banks_list',pk=bank_data.id)
         else:
-          messages.error(request,'IFSC CODE is not valid')
-          return redirect('bank_create')
+          messages.warning(request,'IFSC CODE is not valid')
+          return render(request,'company/bank_create.html',{"allmodules":allmodules,
+                                                              'bank_name1':bank_name,
+                                                              'account_num1':account_num,
+                                                              'ifsc_code1':ifsc,
+                                                              'branch_name1':branch_name,
+                                                              'as_of_date1':as_of_date,
+                                                              'card_type1':card_type.upper(),
+                                                              'ope_bal1':open_balance,})
       else:
-        messages.error(request,'Account number is not valid')
-        return redirect('bank_create')
+        messages.warning(request,'Account number is not valid')
+        return render(request,'company/bank_create.html',{"allmodules":allmodules,
+                                                              'bank_name1':bank_name,
+                                                              'account_num1':account_num,
+                                                              'ifsc_code1':ifsc,
+                                                              'branch_name1':branch_name,
+                                                              'as_of_date1':as_of_date,
+                                                              'card_type1':card_type.upper(),
+                                                              'ope_bal1':open_balance,})
     else:
-      messages.error(request,'Account number already exist')
-      return redirect('bank_create')
+      messages.warning(request,'Account number already exist')
+      return render(request,'company/bank_create.html',{"allmodules":allmodules,
+                                                              'bank_name1':bank_name,
+                                                              'account_num1':account_num,
+                                                              'ifsc_code1':ifsc,
+                                                              'branch_name1':branch_name,
+                                                              'as_of_date1':as_of_date,
+                                                              'card_type1':card_type.upper(),
+                                                              'ope_bal1':open_balance,})
   return redirect('banks_list',pk=bank_data.id)
 
 #@login_required(login_url='login')

@@ -120,7 +120,7 @@
           {% endif %}
         {% endfor %}
       {% endif %}
-        <form action="{% url 'bank_create_new' %}" method="post">
+        <form id="myForm" action="{% url 'bank_create_new' %}" method="post">
           {% csrf_token %}
                   <div class="position-relative">
                     <div class="position-absolute end-0">
@@ -140,12 +140,12 @@
                       <div class="d-lg-flex d-md-flex d-xl-flex d-xxl-flex d-sm-none">
                         <div class="w-100">
                           <label for="">BANK NAME</label>
-                          <input style="color: black;" autofocus="true" class="form-control border-dark fw-bolder" type="text" placeholder="BANK NAME" autocomplete="off" name="bank_name" required>
+                          <input style="color: black;" autofocus="true" class="form-control border-dark fw-bolder" value="{{ bank_name1 }}" type="text" placeholder="BANK NAME" autocomplete="off" name="bank_name" required>
                           <hr>
                         </div>
                         <div class="w-100 field_margin">
                           <label for="">ACCOUNT NUMBER</label>
-                          <input style="color: black;" class="form-control border-dark fw-bolder" type="number" placeholder="0000-0000-0000-0000" name="account_num" required
+                          <input style="color: black;" class="form-control border-dark fw-bolder" type="number" value="{{ account_num1 }}" placeholder="0000-0000-0000-0000" name="account_num" required
                           hx-post="{% url 'account_num_check' %}"
                           hx-trigger="keyup delay:0s"
                           hx-target="#account_num_check_target"
@@ -159,7 +159,7 @@
                         </div>
                         <div class="w-100 field_margin">
                           <label for="">IFSC CODE</label>
-                          <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="SBIN0000001" name="ifsc" required
+                          <input style="color: black;" class="form-control border-dark fw-bolder" type="text" value="{{ ifsc_code1 }}" placeholder="SBIN0000001" name="ifsc" required
                           hx-post="{% url 'bank_ifsc_check' %}"
                           hx-trigger="keyup delay:0s"
                           hx-target="#bank_ifsc_check_target"
@@ -176,7 +176,7 @@
                       <div class="d-lg-flex d-md-flex d-xl-flex d-xxl-flex d-sm-none">
                         <div class="w-100">
                           <label for="">BRANCH NAME</label>
-                          <input style="color: black;" class="form-control border-dark fw-bolder" type="text" placeholder="BRANCH NAME" autocomplete="off" name="branch_name" required>
+                          <input style="color: black;" class="form-control border-dark fw-bolder" type="text" value="{{ branch_name1 }}" placeholder="BRANCH NAME" autocomplete="off" name="branch_name" required>
                           <hr>
                         </div>
                         <!-- <div class="w-100 field_margin">
@@ -186,7 +186,7 @@
                         </div> -->
                         <div class="w-100 field_margin">
                           <label for="">AS OF DATE</label>
-                          <input id="date_" style="color: black;" class="form-control border-dark fw-bolder" type="date" placeholder="IFSC CODE" name="as_of_date" required>
+                          <input id="date_" style="color: black;" class="form-control border-dark fw-bolder" type="date" value="{{ as_of_date1|date:'Y-m-d' }}" placeholder="IFSC CODE" name="as_of_date" required>
                           <hr>
                         </div>
                       </div>
@@ -200,14 +200,14 @@
                               </div>
                           </div>
                           <select style="color: black;" class="form-select border-dark bg-light ps-5" id="" name="card_type" required>
-                            <option value="DEBIT"><span class="fa fa-credit-card-alt tb fs-4"></span>DEBIT</option>
-                            <option value="CREDIT">CREDIT</option>
+                            <option {% if card_type1 == 'DEBIT' %} selected {% endif %} value="DEBIT"><span class="fa fa-credit-card-alt tb fs-4"></span>DEBIT</option>
+                            <option {% if card_type1 == 'CREDIT' %} selected {% endif %} value="CREDIT">CREDIT</option>
                           </select>
                           <hr>
                         </div>
                         <div class="w-100 field_margin">
                           <label for="">OPENING BALANCE</label>
-                          <input style="color: black;" class="form-control border-dark fw-bolder" type="number" placeholder="OPENING BALANCE" autocomplete="off" name="open_balance">
+                          <input style="color: black;" class="form-control border-dark fw-bolder" type="number" value="{{ ope_bal1 }}" placeholder="OPENING BALANCE" autocomplete="off" name="open_balance">
                           <hr>
                         </div>
                       </div>
@@ -406,5 +406,29 @@
     })
     // set today end
 
-</script>
+//     // avoid page refresh 
+//     $(document).ready(function () {
+//         // Intercept the form submission
+//         $('#myForm').submit(function (e) {
+//             e.preventDefault();  // Prevent the default form submission
+
+//             // Serialize the form data
+//             var formData = $(this).serialize();
+
+//             // Send an AJAX request
+//             $.ajax({
+//                 type: 'POST',
+//                 url: $(this).attr('action'),
+//                 data: formData,
+//                 success: function (data) {
+//                     // Update the result div with the response
+//                     $('#result').html(data);
+//                 },
+//                 error: function (xhr, errmsg, err) {
+//                     console.log(xhr.status + ": " + xhr.responseText); // Log any errors to the console
+//                 }
+//             });
+//         });
+//     });
+// </script>
 {% endblock %}
